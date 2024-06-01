@@ -18,24 +18,37 @@ async def 取得景點資料列表(request: Request,
 	try:
 		con.reconnect()
 		cursor = con.cursor(dictionary=True) # 預設回傳資料為tuple[(1,平安鐘)]，轉成用包含字典的列表[{'id':1,'name':平安鐘}]
-		offset = page*12 # 要從第幾條開始讀資料 page=1, offset=12 (從第12條開始讀資料)
 		if keyword:
-			sql =  "SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata INNER JOIN images ON tripdata.id = images.trip_id WHERE mrt = %s OR name LIKE %s GROUP BY trip_id" # 捷運完全比對;景點名模糊比對
-			cursor.execute(sql, (keyword, "%"+keyword+"%"))
+			sql = """SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata 
+			INNER JOIN images ON tripdata.id = images.trip_id 
+			WHERE mrt = %s OR name LIKE %s  
+			GROUP BY trip_id 
+			LIMIT %s, 12""" # 捷運完全比對;景點名模糊比對
+			cursor.execute(sql, (keyword, f"%{keyword}%", page*12))
 		else:
-			sql = "SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata INNER JOIN images ON tripdata.id = images.trip_id GROUP BY trip_id"
-			cursor.execute(sql)
-		result = cursor.fetchall()
+			sql2 = """SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata 
+			INNER JOIN images ON tripdata.id = images.trip_id 
+			GROUP BY trip_id 
+			LIMIT %s, 12"""
+			cursor.execute(sql2, (page*12))
+		data = cursor.fetchall()
 		
 		# 獲取 nextPage 數值
-		if len(result) > offset+12: # 若資料長度>當前頁面可容納的資料數
-			next_page = page+1
+		if len(data) == 12:
+			if keyword:
+				cursor.execute(sql, (keyword, f"%{keyword}%", page*12+12))
+				more_data = cursor.fetchall()
+				if more_data:
+					next_page = page+1
+			else:
+				cursor.execute(sql2, (page*12+12,))
+				more_data = cursor.fetchall()
+				if more_data:
+					next_page = page+1
 		else:
 			next_page = None
-		# 取得分頁，每頁 12 筆資料
-		data = result[offset:offset+12] #切片(slicing)
 		# 將 images 字串拆分為列表
-		for url in result:
+		for url in data:
 			url["images"] = url["images"].split(",")
 
 		return JSONResponse({
@@ -53,7 +66,9 @@ async def 根據景點編號取得景點資料(request: Request,
 	try:
 		con.reconnect()
 		cursor = con.cursor(dictionary=True) # 預設回傳資料為tuple[(1,平安鐘)]，轉成用包含字典的列表[{'id':1,'name':平安鐘}]
-		sql =  "SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata INNER JOIN images ON tripdata.id = images.trip_id WHERE tripdata.id = %s GROUP BY trip_id"
+		sql =  """SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata 
+		INNER JOIN images ON tripdata.id = images.trip_id 
+		WHERE tripdata.id = %s GROUP BY trip_id"""
 		cursor.execute(sql, (attractionId,))
 		data = cursor.fetchone()
 		if data:
