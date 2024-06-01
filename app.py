@@ -30,7 +30,7 @@ async def 取得景點資料列表(request: Request,
 			INNER JOIN images ON tripdata.id = images.trip_id 
 			GROUP BY trip_id 
 			LIMIT %s, 12"""
-			cursor.execute(sql2, (page*12))
+			cursor.execute(sql2, (page*12,))
 		data = cursor.fetchall()
 		
 		# 獲取 nextPage 數值
