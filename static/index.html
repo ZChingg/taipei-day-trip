@@ -1,11 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Index</title>
+  <link rel="stylesheet" type="text/css" href="static/index.css" />
 </head>
-<body>
-  
+<body style="margin: 0px">
+  <div class="navigation">
+    <div class="frame" style="height: 34px">
+      <h2 style="color:#448899">台北一日遊</h2>
+      <div class="frame-flexend">
+        <div class="item-navigation">預定行程</div>
+        <div class="item-navigation">登入/註冊</div>
+      </div>
+    </div>
+  </div>
+  <div class="welcome">
+    <div class="frame-slogan">
+      <h1 class="slogan-relax">輕鬆享受台北一日悠閒</h1>
+      <div class="slogan-develop">探索每個角落，體驗城市的深度旅遊行程</div>
+      <div class="searchbar">
+        <input class="input" type="text" placeholder="輸入景點名稱查詢" />
+        <button class="search" type="submit" onclick="getKeyword()"><img src="static/pic/search.png"></img>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="frame-listbar">
+    <img src="static/pic/States=Hovered-left.png" class="arrow-left">
+    <div class="container">
+      <div></div> <!-- appendchild 加對應 mrt -->
+    </div>
+    <img src="static/pic/States=Hovered-right.png" class="arrow-right">
+  </div>
+  <div class="frame-attraction"></div> <!-- appendchild 加對應 attrction -->
+  <div class="footer">COPYRIGHT © 2021 台北一日遊</div>
+  <script type="text/javascript" src="static/index.js"></script>
 </body>
 </html>
