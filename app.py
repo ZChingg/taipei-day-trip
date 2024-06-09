@@ -1,11 +1,13 @@
 from fastapi import *
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 import mysql.connector
 app=FastAPI() #uvicorn app:app --reload
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 con = mysql.connector.connect(
     user = "root",
-    password = "0000",
+    password = "a32128466",
     host = "localhost",
     database = "trip"
 )
