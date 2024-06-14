@@ -14,8 +14,18 @@ h2{
 body{
     font-size: 16px;
     line-height: 14px;
+    font-weight: 400;
     color: #666666;
+    font-family: Noto Sans TC;
 }
+.body-bold{
+    font-weight: 700;
+}
+a:-webkit-any-link{
+    color: #448899;
+    text-decoration: none;
+}
+
 .navigation{
     display:flex; /* 下一層次的項目水平排列 */ 
     align-items:center; /* 垂直對齊 */
@@ -30,6 +40,7 @@ body{
     align-items:center; 
     margin: auto; /* 常用於置中元素，將剩下的空間平均分配給四周 */
     width: 1200px;
+    height: 34px;
 }
 .frame-flexend{
     display:flex;
@@ -39,13 +50,14 @@ body{
 .item-navigation{
     flex:none;
     padding:10px;
+    font-weight: 500;
 }
 .item-navigation:hover{
     color:black;
     cursor: pointer;
 }
 .welcome{
-    background-image: url("pic/welcome.png");
+    background-image: url("/static/pic/welcome.png");
     background-size: cover; /*讓圖片覆蓋整個容器，並保留圖片比例*/
     background-position: top; /*確保圖片置中*/
     height: 320px;
