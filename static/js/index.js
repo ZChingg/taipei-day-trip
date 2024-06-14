@@ -14,10 +14,11 @@ arrowLeft.addEventListener("click", ()=>{
 // 因應網頁寬度設置每次滾動距離
 function getDistance(){
   let width = window.innerWidth;
+  let containerDistance = document.querySelector(".container").offsetWidth;
   if(width >= 600 && width <= 1199){
-    return 450;
+    return containerDistance*0.9;
   }else if(width <= 599){
-    return 200;
+    return containerDistance*0.8;
   }else{
     return 1050;
   }
