@@ -4,8 +4,65 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Attraction</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/attraction.css" />
 </head>
 <body>
-  
+  <div class="navigation">
+    <div class="frame">
+      <h2><a href="http://127.0.0.1:8000/">台北一日遊</a></h2>
+      <div class="frame-flexend">
+        <div class="item-navigation">預定行程</div>
+        <div class="item-navigation">登入/註冊</div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="frame-section">
+    <div class="slider">
+      <div class="slider-box"></div> <!-- appendchild myslide -->
+      <a class="prev">
+        <img src="/static/pic/attraction-arrow-left.png">
+      </a>
+      <a class="next">
+        <img src="/static/pic/attraction-arrow-right.png">
+      </a>
+      <div class="dotsbox"></div> <!-- appendchild dot -->
+    </div>
+    <div class="profile">
+      <h3 id ="name"></h3>
+      <div class="body" id = category></div>
+      <div class="bookingForm">
+        <div class="body-bold">訂購導覽行程</div>
+        <div class="infos-content">以此景點為中心的一日行程，帶您探索城市角落故事</div>
+        <div class="group">
+          <div class="body-bold">選擇日期：</div>
+          <input type="date" class="input-date">
+        </div>
+        <div class="group">
+          <div class="body-bold">選擇時間：</div>
+          <!-- 以相同的 name 建立單選按鈕組，這樣就無法複選 -->
+          <!-- 需設置 value 以回傳使用者選擇 -->
+          <input type="radio" name="day" value="morning" checked onclick="changeToMorning();">上半天
+          <input type="radio" name="day" value="afternoon" onclick="changeToAfternoon();">下半天
+        </div>
+        <div class="group">
+          <div class="body-bold">導覽費用：</div>
+          <div id="morning">新台幣 2000 元</div>
+          <div id="afternoon" style="display: none;">新台幣 2500 元</div>
+        </div>
+        <button class="bookingbtn">開始預約行程</button>
+      </div>
+    </div>
+  </div>
+  <hr class="hr-middle">
+  <div class="frame-infos">
+    <div class="infos-content" id="description"></div>
+    <div class="infos-title">景點地址：</div>
+    <div class="infos-content" id="address"></div>
+    <div class="infos-title">交通方式：</div>
+    <div class="infos-content" id="transport"></div>
+  </div>
+  <footer>COPYRIGHT © 2021 台北一日遊</footer>
+  <script src="/static/js/attraction.js"></script>
 </body>
 </html>

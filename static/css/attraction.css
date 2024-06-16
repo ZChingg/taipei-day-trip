@@ -1,0 +1,317 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap');
+
+*{
+  margin: 0;
+}
+h1{
+    font-size: 28px;
+    line-height: 24px;
+    font-weight: 700;
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
+h2{
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 700;
+  padding-left: 10px;
+}
+h3{
+  font-size: 24px;
+  line-height: 24px;
+  font-weight: 700;
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+body{ /* 設定的值會套用至所有文字 */
+  font-size: 16px;
+  line-height: 14px;
+  font-weight: 400;
+  color: #666666;
+  font-family: "Noto Sans TC", sans-serif; /* 若無法使用首個字型，則指定無襯線的隨意內建字型(通用字) */
+  background-color: white;
+}
+.body-bold{
+  font-weight: 700;
+}
+a:any-link{
+  color: #448899;
+  text-decoration: none;
+}
+
+.navigation{
+  display:flex; /* 下一層次的項目水平排列 */ 
+  align-items:center; /* 垂直對齊 */
+  position: sticky;
+  top: 0;
+  height: 54px;
+  background-color: white;
+  z-index: 1;
+}
+.frame{
+  display:flex;
+  align-items:center; 
+  margin: auto; /* 常用於置中元素，將剩下的空間平均分配給四周 */
+  width: 1200px;
+  height: 34px;
+}
+.frame-flexend{
+  display:flex;
+  justify-content:flex-end;
+  flex:auto;
+}
+.item-navigation{
+  flex:none;
+  padding:10px;
+  font-weight: 500;
+}
+.item-navigation:hover{
+  color:black;
+  cursor: pointer;
+}
+hr{
+  border: 1px solid #E8E8E8;
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+.frame-section{
+  display: flex;
+  box-sizing: border-box;
+  width: 1200px;
+  height: 400px;
+  padding: 0px 15px;
+  margin:auto;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+.slider{
+  position: relative;
+  height: 400px;
+  width: 540px;
+}
+.slider-box{
+  height: 100%;
+  width: 100%;
+}
+.myslide{
+  height: 100%;
+  width: 100%;
+  display: none;
+  overflow: hidden;
+  border-radius: 5px;
+  background-size: cover; /* 讓 圖片覆蓋整個容器，並保留圖片比例 */
+  background-position: center; /* 確保圖片置中 */
+}
+.prev, .next{
+  position: absolute;
+  top:50%;
+  transform: translate(0, -50%);
+  padding: 10px;
+  cursor: pointer;
+  opacity: 75%;
+}
+.prev:hover, .next:hover{
+  opacity: 90%;
+}
+.next{
+  right:0;
+}
+.dotsbox{
+  position: absolute;
+  left:50%; /* 百分比基準為 block container */
+  bottom:10px;
+  transform: translate(-50%); /* 百分比基準為自己的寬高，常與 position 搭配使用 */
+  cursor: pointer;
+  opacity: 75%;
+}
+.dot{
+  display: inline-block; /* 元素依內容撐開，並會在行內並排 */
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border: 1px solid white;
+  border-radius: 50%;
+  margin: 0 6px;
+  cursor: pointer;
+}
+.active, .dot:hover{
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.fade{
+  animation-name: fade; /* 套用名為 fade 的動畫 */
+  animation-duration: 1.5s; /* 動畫持續時間，預設0 */
+}
+/* @keyframe 關鍵影格(動畫)做淡入 */
+@keyframes fade{
+  from {opacity: 0.5}
+  to {opacity: 1;}
+}
+
+.profile{
+  width: 600px;
+  height: 400px;
+  margin-left: 30px;
+  display:grid;
+  grid-gap: 15px; /*20注意*/
+  grid-template-columns: 100%;
+  grid-template-rows: 33px 22px auto;
+  align-items:center; /* 垂直對齊 */
+}
+
+.bookingForm{
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 22px auto 35px 22px 22px 36px;
+  grid-gap: 15px;
+  margin-top: 5px;
+  border-radius: 5px;
+  background-color: #E8E8E8;
+  width: 100%;
+  height: auto;
+  padding: 15px 20px 50px 20px;
+  align-items: center; /* 垂直對齊 */
+  align-self: start; /* 覆寫其 aligin-item 值，改對齊最上方 */
+}
+.bookingbtn{
+  box-sizing: border-box;
+  margin-top: 10px;
+  border-radius: 5px;
+  background-color: #448899;
+  width: 154px;
+  height: 100%;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 16px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.bookingbtn:hover{
+  background-color: #3E7E8E;
+}
+.input-date{
+  box-sizing: border-box;
+  border: none;
+  width: 193px;
+  height: 35px;
+  padding: 5px 10px;
+  font-size: 16px;
+  line-height: 14px;
+  font-weight: 400;
+  font-family: Noto Sans TC;
+}
+input[type="date"]::-webkit-calendar-picker-indicator{
+  width: 22px;
+  height: 22px;
+}
+input[type="radio"]{
+  width: 22px;
+  height: 22px;
+  appearance: none;
+  position: relative;
+  background: white;
+  border-radius: 50%;
+  margin: 0 5px 0 15px;
+}
+input[type="radio"]:checked:before{
+  content: "";
+  position: absolute;
+  background: #448899;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 80%;
+  height: 80%;
+  border: none;
+  border-radius: 50%;
+}
+.group{
+  display: flex;
+  align-items: center; /* 垂直居中對齊 */
+}
+.hr-middle{
+  width: 1200px;
+  margin: auto;
+  margin-bottom: 40px;
+}
+.frame-infos{
+  box-sizing: border-box;
+  width: 1200px;
+  padding: 10px;
+  margin: auto; 
+  margin-bottom: 90px;
+}
+.infos-title{
+  display: flex;
+  font-weight: 700;
+  height: 32px;
+  align-items: center;
+  margin-top: 30px;
+}
+.infos-content{
+  font-size: 16px;
+  line-height: 23.17px;
+  text-align: left;
+  width: 100%;
+}
+footer{
+  display:flex;
+  justify-content: center;
+  align-items: center; /* 垂直對齊 */
+  height: 104px;
+  background-color: #666666;
+  font-weight: 700;
+  color: white;
+}
+
+@media(min-width:680px) and (max-width:1199px){
+  .frame{
+    width: 100%;
+  }
+  .frame-section{
+    width: 100%;
+  }
+  .hr-middle{
+    width: 100%;
+  }
+  .frame-infos{
+    width: 100%;
+  }
+}
+
+
+@media (max-width:679px){
+  .frame{
+    width: 100%;
+  }
+  .frame-section{
+    display: block; 
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin-top: 0;
+  }
+  .slider{
+    height: 350px;
+    width: 100%;
+  }
+  .profile{
+    box-sizing: border-box;
+    margin:0;
+    padding: 20px 10px 0px 10px;
+    width: 100%;
+    height: 100%;
+  }
+  .bookingForm{
+    padding: 15px 20px 30px 20px;
+  }
+  .hr-middle{
+    width: 100%;
+  }
+  .frame-infos{
+    width: 100%;
+  }
+}
