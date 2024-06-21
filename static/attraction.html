@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Attraction</title>
   <link rel="stylesheet" type="text/css" href="/static/css/attraction.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/popup.css" />
 </head>
 <body>
   <div class="navigation">
     <div class="frame">
-      <h2><a href="http://127.0.0.1:8000/">台北一日遊</a></h2>
+      <h2><a href="/">台北一日遊</a></h2>
       <div class="frame-flexend">
         <div class="item-navigation">預定行程</div>
-        <div class="item-navigation">登入/註冊</div>
+        <div class="item-navigation" id="signin" onclick="getSign()">登入/註冊</div>
+        <div class="item-navigation" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
       </div>
     </div>
   </div>
@@ -63,6 +65,37 @@
     <div class="infos-content" id="transport"></div>
   </div>
   <footer>COPYRIGHT © 2021 台北一日遊</footer>
+  <!-- popup menu -->
+  <div class="wrapper-popup"> <!-- 黑色部分 -->
+    <!-- 登入帳號 Signin -->
+   <div class="popup move" id="popup-signin">
+     <div class="popup-decoratorbar"></div>
+     <div class="popup-content">
+       <h3 class="popup-title">登入會員帳號</h3>
+       <div class="popup-close" onclick="getClose()"><img src="/static/pic/close.png"></img></div>
+         <input type="email" id="signin-email" class="popup-input" placeholder="輸入電子郵件"/>
+         <input type="password" id="signin-password" class="popup-input input-password" placeholder="輸入密碼"/>
+         <button class="popup-btn" onclick="getSignIn()">登入帳戶</button>
+       <div class="popup-alert" id="signin-alert"></div>
+       <div class="popup-message">還沒有帳戶了？<span class="popup-change" onclick="ChangeToSignUp()">點此註冊</span></div>
+     </div>
+   </div> 
+   <!-- 註冊帳號 Signup -->
+   <div class="popup move" id="popup-signup" style="display: none;">
+     <div class="popup-decoratorbar"></div>
+     <div class="popup-content">
+       <h3 class="popup-title">註冊會員帳號</h3>
+       <div class="popup-close" onclick="getClose()"><img src="/static/pic/close.png"></img></div>
+       <input type="text" id="signup-name" class="popup-input" placeholder="輸入姓名"/>
+       <input type="email" id="signup-email" class="popup-input" placeholder="輸入電子郵件"/>
+       <input type="password" id="signup-password" class="popup-input input-password" placeholder="輸入密碼"/>
+       <button class="popup-btn" onclick="getSignUp()">註冊新帳號</button>
+       <div class="popup-alert" id="signup-alert"></div>
+       <div class="popup-message">已經有帳戶了？<span class="popup-change" onclick="ChangeToSignIn()">點此登入</span></div>
+     </div>
+   </div>
+  </div>
+  <script src="/static/js/sign.js"></script>
   <script src="/static/js/attraction.js"></script>
 </body>
 </html>
