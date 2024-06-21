@@ -290,7 +290,7 @@ footer{
     .frame-slogan{
         width: 100%;
     }
-    input{
+    .input-search{
         width: calc(100% - 160px); /* 減號要空格 */
     }
     .frame-attraction{

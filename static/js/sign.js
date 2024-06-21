@@ -73,7 +73,15 @@ function ChangeToSignUp(){
 function getSignIn(){
   let email = document.getElementById("signin-email").value;
   let password = document.getElementById("signin-password").value;
+  let alert = document.getElementById("signin-alert");
   if(email !== "" && password !== ""){
+    let emailRule = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/; // 正規表達式
+    if(!emailRule.test(email)){ // regexObj.test(str): 正規表達式與指定字串是否匹配
+      alert.style.display = "flex";
+      alert.style.color = "darkred";
+      alert.textContent = "請輸入有效的電子郵件";
+      return; // 停止函數執行
+    }
     let data = { 
       email: email, // 名稱需與後端 pydantic model 一致
       password: password
@@ -89,14 +97,12 @@ function getSignIn(){
         localStorage.setItem("token", data.token); // setItem("key", "value"): 加入/修改屬性
         location.reload(); // refresh
       }else{
-        let alert = document.getElementById("signin-alert");
         alert.style.display = "flex";
         alert.style.color = "darkred"
         alert.textContent = "電子郵件或密碼錯誤"
       }
     })
   }else{
-    let alert = document.getElementById("signin-alert");
     alert.style.display = "flex";
     alert.style.color = "darkred"
     alert.textContent = "請輸入電子郵件與密碼"
@@ -107,12 +113,20 @@ function getSignUp(){
   let name = document.getElementById("signup-name").value;
   let email = document.getElementById("signup-email").value;
   let password = document.getElementById("signup-password").value;
+  let alert = document.getElementById("signup-alert");
   if(name !=="" && email !== "" && password !== ""){
+    let emailRule = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+    if(!emailRule.test(email)){ 
+      alert.style.display = "flex";
+      alert.style.color = "darkred";
+      alert.textContent = "請輸入有效的電子郵件";
+      return;
+    }
     let data = { 
       name: name,
       email: email,
       password: password
-    }
+    };
     fetch("/api/user", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -121,22 +135,19 @@ function getSignUp(){
       return response.json();
     }).then(function(data){
       if(data.ok){
-        let alert = document.getElementById("signup-alert");
         alert.style.display = "flex";
-        alert.style.color = "green"
-        alert.textContent = "註冊成功，請登入系統"
+        alert.style.color = "green";
+        alert.textContent = "註冊成功，請登入系統";
       }else{
-        let alert = document.getElementById("signup-alert");
         alert.style.display = "flex";
-        alert.style.color = "darkred"
-        alert.textContent = "Email 已經註冊帳戶"
+        alert.style.color = "darkred";
+        alert.textContent = "Email 已經註冊帳戶";
       }
     })
   }else{
-    let alert = document.getElementById("signup-alert");
     alert.style.display = "flex";
-    alert.style.color = "darkred"
-    alert.textContent = "請輸入姓名、電子郵件與密碼"
+    alert.style.color = "darkred";
+    alert.textContent = "請輸入姓名、電子郵件與密碼";
   }
 }
 
