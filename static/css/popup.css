@@ -1,0 +1,108 @@
+.wrapper-popup{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.25);
+}
+.popup{
+  position: absolute;
+  top: 6cap;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 340px;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0px 4px 60px 0px #AAAAAA;
+}
+.move{ /* 時間曲線: 預設為 ease (急加速後減速) */
+  animation-name: move;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards; /* 停在結束狀態 */
+}
+@keyframes move{
+  from {top: 60px;}
+  to {top: 80px;}
+}
+
+.popup-decoratorbar{
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(270deg, #337788 0%, #66AABB 100%); /* 漸變語法: linear-gradient(角度, 起始色彩 起始色彩位置, 結束色彩 結束色彩位置); */
+  border-radius: 6px 6px 0 0;
+}
+.popup-content{
+  box-sizing: border-box;
+  width: 100%;
+  padding: 15px;
+  position: relative;
+}
+.popup-close{
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 10px;
+  right: 10px;
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+}
+.popup-title{
+  text-align: center;
+  margin-bottom: 15px;
+}
+.popup-input{
+  box-sizing: border-box;
+  width: 100%;
+  height: 47px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid #CCCCCC;
+  background: white;
+  font-size: 16px;
+  line-height: 14px;
+  font-family: "Noto Sans TC", sans-serif;
+}
+.input-password{
+  font-family: sans-serif;
+}
+.popup-btn{
+  box-sizing: border-box;
+  width: 100%;
+  height: 47px;
+  border-radius: 5px;
+  background: #448899;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 19px;
+  line-height: 16px;
+  color: white;
+}
+.popup-alert{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  height: 22px;
+  margin-top: 10px;
+  display: none;
+}
+.popup-message{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  height: 22px;
+  margin-top: 10px;
+}
+.popup-change{
+  cursor: pointer;
+}

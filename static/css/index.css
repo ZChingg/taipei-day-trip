@@ -15,6 +15,13 @@ h2{
     font-weight: 700;
     padding-left: 10px;
 }
+h3{
+    font-size: 24px;
+    line-height: 24px;
+    font-weight: 700;
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
 body{
     font-size: 16px;
     line-height: 14px;
@@ -32,8 +39,8 @@ a:-webkit-any-link{
 }
 
 .navigation{
-    display:flex; /* 下一層次的項目水平排列 */ 
-    align-items:center; /* 垂直對齊 */
+    display: flex;
+    align-items: center; /* 垂直對齊 */
     position: sticky;
     top: 0;
     height: 54px;
@@ -41,30 +48,30 @@ a:-webkit-any-link{
     z-index: 1;
 }
 .frame{
-    display:flex;
-    align-items:center; 
+    display: flex;
+    align-items: center; 
     margin: auto; /* 常用於置中元素，將剩下的空間平均分配給四周 */
     width: 1200px;
     height: 34px;
 }
 .frame-flexend{
-    display:flex;
-    justify-content:flex-end;
-    flex:auto;
+    display: flex;
+    justify-content: flex-end;
+    flex: auto;
 }
 .item-navigation{
-    flex:none;
-    padding:10px;
+    flex: none;
+    padding: 10px;
     font-weight: 500;
 }
 .item-navigation:hover{
-    color:black;
+    color: black;
     cursor: pointer;
 }
 .welcome{
     background-image: url("/static/pic/welcome.png");
-    background-size: cover; /*讓圖片覆蓋整個容器，並保留圖片比例*/
-    background-position: top; /*確保圖片置中*/
+    background-size: cover; /* 讓圖片覆蓋整個容器，並保留圖片比例 */
+    background-position: top; /* 確保圖片置中 */
     height: 320px;
 }
 .frame-slogan{
@@ -81,17 +88,17 @@ a:-webkit-any-link{
 }
 .slogan-relax{
    height: 41px;
-   color:#F8F8F8;
+   color: #F8F8F8;
 }
 .slogan-develop{
     height: 22px;
     font-weight: 700;
-    color:#F8F8F8;
+    color: #F8F8F8;
 }
 .searchbar{
     display: flex;
 }
-input{
+.input-search{
     box-sizing: border-box;
     width: 400px;
     height: 46px;
@@ -117,38 +124,38 @@ input{
 }
 .frame-listbar{
     box-sizing: border-box;
-    display:flex;
-    align-items:center; 
-    margin: auto; /* 常用於置中元素，將剩下的空間平均分配給四周 */
+    display: flex;
+    align-items: center; 
+    margin: auto;
     width: 1200px;
     height: 70px;
     padding: 0px 0px 20px 0px;
-    margin-top:35px;
+    margin-top: 35px;
 }
 .arrow-left{
-    padding:9px 0 9px 15px;
-    opacity:50%;
+    padding: 9px 0 9px 15px;
+    opacity: 50%;
     margin-right: 10px;
     cursor: pointer;
 }
 .arrow-left:hover{
-    opacity:100%;
+    opacity: 100%;
 }
 .arrow-right{
-    padding:9px 15px 9px 0;
-    opacity:50%;
+    padding: 9px 15px 9px 0;
+    opacity: 50%;
     margin-left: 10px;
     cursor: pointer;
 }
 .arrow-right:hover{
-    opacity:100%;
+    opacity: 100%;
 }
 .container{
     width: 1106px;
     height: 50px;
     display: flex;
-    overflow-x: scroll;
-    align-items: center; /* 垂直對齊 */
+    overflow-x: scroll; /* 超出的部分用 scroll 功能 */
+    align-items: center; 
 }
 .container div{
     display: grid;
@@ -165,12 +172,12 @@ input{
     white-space: nowrap; /* 確保單行顯示不換行 */
 }
 .item-list:hover{
-    color:black;
+    color: black;
     cursor: pointer;
 }
 .frame-attraction{
     box-sizing: border-box;
-    display:grid;
+    display: grid;
     margin: auto;
     width: 1200px;
     grid-template-columns: repeat(4, 1fr);
@@ -234,17 +241,17 @@ input{
     height: 25px;
 }
 .category{
-    display:flex;
+    display: flex;
     align-items: center;
     width: 125px;
     height: 25px;
-    justify-content:flex-end;
+    justify-content: flex-end;
     flex:auto;
 }
-.footer{
-    display:flex;
+footer{
+    display: flex;
     justify-content: center;
-    align-items: center; /* 垂直對齊 */
+    align-items: center;
     height: 104px;
     background-color: #666666;
     font-weight: 700;
@@ -283,7 +290,7 @@ input{
     .frame-slogan{
         width: 100%;
     }
-    input{
+    .input-search{
         width: calc(100% - 160px); /* 減號要空格 */
     }
     .frame-attraction{

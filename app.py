@@ -1,7 +1,12 @@
 from fastapi import *
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel
 import mysql.connector
+import jwt
+import datetime
+
 app=FastAPI() #uvicorn app:app --reload
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -15,7 +20,7 @@ print("資料庫連線成功")
 
 @app.get("/api/attractions")
 async def 取得景點資料列表(request: Request,
-					 page: int = Query(0, ge=0), # ge=0 為 grater than or equal to 0
+					 page: int = Query(0, ge=0), # ge=0 為 greater than or equal to 0
 					 keyword: str = Query(None)):
 	try:
 		con.reconnect()
@@ -80,7 +85,7 @@ async def 根據景點編號取得景點資料(request: Request,
 		})
 		else:
 			return JSONResponse(
-				{"error": True, "message": "請按照情境提供對應的錯誤訊息"},
+				{"error": True, "message": "景點編號不正確"},
 				status_code=400)
 	except Exception as e: # 例外處理，Exception: 通用的異常類型(不知錯誤型別)
 		return JSONResponse({
@@ -107,7 +112,99 @@ async def 取得捷運站名稱列表(request: Request):
 		"error": True, "message": f"{e}"},
 		status_code=500)
 
+
+class SignUp(BaseModel):
+	name: str 
+	email: str
+	password: str
+
+class SignIn(BaseModel):
+	email: str
+	password: str
+
+SECRET_KEY = "BF6B06649E573E1F9049B869DD4F83CCBA8C250E733C9E2F8DAD2081611CAB1C"
+
+@app.post("/api/user")
+async def 註冊一個新的會員(request: Request,
+				   data: SignUp = None):
+	try:
+		signup_dict = data.model_dump() # 將資料轉換為字典格式
+		name = signup_dict["name"] # 取值
+		email = signup_dict["email"]
+		password = signup_dict["password"]
+		con.reconnect()
+		cursor = con.cursor(dictionary=True)
+		cursor.execute("SELECT email FROM member WHERE email = %s", (email,))
+		data = cursor.fetchone()
+		if data:
+			return JSONResponse(
+				{"error": True, "message": "註冊失敗，重複的 Email 或其他原因"},
+				status_code=400)
+		else:
+			cursor.execute("INSERT INTO member(name, email, password) VALUES(%s, %s, %s)", (name, email, password))
+			con.commit()
+			return JSONResponse(
+				{"ok": True})
+	except Exception as e:
+		return JSONResponse(
+			{"error": True, "message": f"{e}"},
+			status_code=500)
+
+# HTTP Bearer token authentication (JWT驗證)
+security = HTTPBearer()
+
+def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): # credentials 是 HTTPAuthorizationCredentials 類型（包含著 scheme、credentials），且依賴於 security
+	try:
+		token = credentials.credentials # 會從請求 header 獲取 token，若是 credentials.scheme 就是獲取 "Bearer"
+		payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+		return payload
+	except jwt.exceptions.DecodeError:
+		raise HTTPException(status_code=401, detail="Token expired")
+	except jwt.exceptions.InvalidTokenError:
+		raise HTTPException(status_code=401, detail="Invalid token")
+	except Exception as e:
+		raise HTTPException(status_code=500, detail=f"{e}")
+
+@app.get("/api/user/auth")
+async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer)): # payload 是字典類型，且值由 Depends(jwt_bearer) 提供
+    return JSONResponse({"data": payload["data"]})
+
+@app.put("/api/user/auth")
+async def 登入會員帳戶(request: Request,
+				 data: SignIn = None): 
+	try:
+		signin_dict = data.model_dump() # 將資料轉換為字典格式
+		email = signin_dict["email"]
+		password = signin_dict["password"]
+		con.reconnect()
+		cursor = con.cursor()
+		cursor.execute("SELECT id, name, email FROM member WHERE email = %s and password = %s", (email, password))
+		data = cursor.fetchone()
+		if data:
+			id, name, email = data
+			payload = {
+				"exp": (datetime.datetime.now()+datetime.timedelta(days=1)).timestamp(), # 現在時間+一天後轉為時間戳
+				"data": {
+					"id": id, 
+					"name": name, 
+					"email": email
+					}
+			}
+			token = jwt.encode(payload, SECRET_KEY, algorithm = "HS256")
+			return JSONResponse(
+				{"token": token}) 
+		else:
+			return JSONResponse(
+				{"error": True, "message": "登入失敗，帳號或密碼錯誤或其他原因"},
+				status_code=400)
+	except Exception as e: # 例外處理，Exception: 通用的異常類型(不知錯誤型別)
+		return JSONResponse({
+		"error": True, "message": f"{e}"},
+		status_code=500)
+
 con.close()
+
+
 
 # Static Pages (Never Modify Code in this Block)
 @app.get("/", include_in_schema=False)

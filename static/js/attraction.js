@@ -13,10 +13,10 @@ function changeToAfternoon(){
 }
 
 // 獲取 attractionId 數字抓取對應資訊
-let path = window.location.pathname; // 獲取 /attraction/10
-let attractionId = path.split("/").pop(); // 移除陣列最後一個值(縮短陣列長度)，並將 "值回傳"
+let path = window.location.pathname; // 獲取path: /attraction/10
+let attractionId = path.split("/").pop(); // pop(): 移除陣列最後一個值(縮短陣列長度)，並將 "值回傳"
 // 抓資料
-fetch(`http://127.0.0.1:8000/api/attraction/${attractionId}`)
+fetch(`/api/attraction/${attractionId}`)
 .then(function(response){
   return response.json();
 }).then(function(data){
@@ -83,7 +83,7 @@ fetch(`http://127.0.0.1:8000/api/attraction/${attractionId}`)
       timer = setInterval(autoSlide, 5000);
     }
 
-    function slidefun(n){
+    function slidefun(counter){
       // 先把所有圖片都隱藏+圓點回歸一般樣式
       for(let i=0; i<myslide.length; i++){
         myslide[i].style.display = "none";
@@ -92,11 +92,11 @@ fetch(`http://127.0.0.1:8000/api/attraction/${attractionId}`)
         dot[i].className = dot[i].className.replace(" active", "");
       }
       // 循環: 計數超出照片總數就回到第一張
-      if(n > myslide.length){
+      if(counter > myslide.length){
         counter = 1;
       }
       // 循環: 計數0/負數就回到最後一張
-      if(n < 1){
+      if(counter < 1){
         counter = myslide.length;
       }
       myslide[counter-1].style.display = "block";
@@ -111,6 +111,6 @@ fetch(`http://127.0.0.1:8000/api/attraction/${attractionId}`)
       plusSlides(1);
     });
   }else{
-    document.location.href="http://127.0.0.1:8000/"
+    document.location.href="/" // 若數字沒資料就導回首頁
   }
 });

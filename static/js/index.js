@@ -14,7 +14,7 @@ arrowLeft.addEventListener("click", ()=>{
 // 因應網頁寬度設置每次滾動距離
 function getDistance(){
   let width = window.innerWidth;
-  let containerDistance = document.querySelector(".container").offsetWidth;
+  let containerDistance = document.querySelector(".container").offsetWidth; // 元素本身寬度(含border/捲軸/padding)
   if(width >= 600 && width <= 1199){
     return containerDistance*0.9;
   }else if(width <= 599){
@@ -24,7 +24,7 @@ function getDistance(){
   }
 }
 // 載入 mrt 資料
-fetch("http://127.0.0.1:8000/api/mrts")
+fetch("/api/mrts")
 .then(function(response){
   return response.json();
 }).then(function(mrt){
@@ -43,16 +43,16 @@ fetch("http://127.0.0.1:8000/api/mrts")
 });
 // 點擊 mrt 搜尋
 function getMRT(mrts){
-  let input = document.querySelector(".input");
+  let input = document.querySelector(".input-search");
   input.value = mrts;
   getKeyword();
 }
 
 // Main
+// 宣告變數
 let nextPage = 0;
-let observer;
 // 初始載入 attraction 資料
-fetch("http://127.0.0.1:8000/api/attractions")
+fetch("/api/attractions")
 .then(function(response){
   return response.json();
 }).then(function(data){
@@ -64,18 +64,18 @@ fetch("http://127.0.0.1:8000/api/attractions")
     createBox(site, frameAttraction);
   }
   // 使用 IntersectionObserver 監聽是否至最底部，完成無限滾動
-  observer = new IntersectionObserver(function(entries){
+  let observer = new IntersectionObserver(function(entries){
     let footer = entries[0]; // entries 會回傳一陣列(裝所有被監聽的元素)，因 footer 只有一筆故用 [0]
     if(footer.isIntersecting){ // 若有被觀察到(表出現在視窗中)
       getAttraction(); // 載入新元素
     }
   });
-  observer.observe(document.querySelector(".footer")); // 觀察 footer
+  observer.observe(document.querySelector("#footer")); // 觀察 footer
 });
-
+// 隨著網頁下滑載入的更多資料
 function getAttraction(){
-  let keyword = document.querySelector(".input").value; // 獲取值
-  let url = `http://127.0.0.1:8000/api/attractions?page=${nextPage}`;
+  let keyword = document.querySelector(".input-search").value; // 獲取值
+  let url = `/api/attractions?page=${nextPage}`;
   if(keyword){
     url += `&keyword=${keyword}`;
   }
@@ -94,17 +94,15 @@ function getAttraction(){
     });
   }
 }
-
+// 搜尋欄輸入關鍵字載入對應資料
 function getKeyword(){
-  nextPage = 0;
-  console.log(nextPage);
-  let keyword = document.querySelector(".input").value; // 獲取值
-  fetch(`http://127.0.0.1:8000/api/attractions?page=${nextPage}&keyword=${keyword}`)
+  nextPage = 0; // 重點: nextPage 重新賦值為 0 
+  let keyword = document.querySelector(".input-search").value; // 獲取值
+  fetch(`/api/attractions?page=${nextPage}&keyword=${keyword}`)
   .then(function(response){
     return response.json();
     }).then(function(data){
       nextPage = data.nextPage; // 更新 nextPage 數字
-      console.log(nextPage);
       let frameAttraction = document.querySelector(".frame-attraction");
       frameAttraction.innerHTML = ""; // 清空現有的 box 元素
       // 抓 data 中資料，同步創建新 div
@@ -112,8 +110,7 @@ function getKeyword(){
         let site = data.data[i];
         createBox(site, frameAttraction);
       }
-      observer.disconnect();
-      observer.observe(document.querySelector(".footer"));
+      // 移除斷聯再重新接上 IntersectionObserver
     });
   }
 
@@ -128,7 +125,7 @@ function createBox(site, frameAttraction){ // 接收 site 數據 & frameAttracti
   let box = document.createElement("div");
   box.className = "box";
   let link = document.createElement("a");
-  link.href = `http://127.0.0.1:8000/attraction/${id}`;
+  link.href = `/attraction/${id}`;
 
   let attraction = document.createElement("div");
   attraction.className = "attraction";

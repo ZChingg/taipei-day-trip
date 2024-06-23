@@ -97,7 +97,6 @@ hr{
   height: 100%;
   width: 100%;
   display: none;
-  overflow: hidden;
   border-radius: 5px;
   background-size: cover; /* 讓 圖片覆蓋整個容器，並保留圖片比例 */
   background-position: center; /* 確保圖片置中 */
