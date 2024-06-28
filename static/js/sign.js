@@ -7,17 +7,40 @@ if(token){
   }).then(function(response){
     return response.json();
   }).then(function(data){ 
-    if(data.data){ // 若有抓到資料(已登入)，顯示"登出系統"文字
+    if(data != null && data.data){ 
+      // 若有抓到資料(已登入)，顯示"登出系統"文字
       let signoutText = document.getElementById("signout");
       let signinText = document.getElementById("signin");
       signoutText.style.display = "block";
       signinText.style.display = "none";
+      // 點擊 "預定行程"，導連至 bookong 頁面
+      document.getElementById("bookingPage").addEventListener("click", ()=>{
+        document.location.href="/booking" 
+      });
+      // booking 頁面預填聯絡資訊用
+      let welcomeMemberName = document.getElementById("welcomeMemberName");
+      let bookingName = document.getElementById("bookingName");
+      let bookingEmail = document.getElementById("bookingEmail");
+      if(welcomeMemberName && bookingName && bookingEmail){
+        let memberName = data.data.name;
+        let memberEmail = data.data.email;
+        welcomeMemberName.textContent = memberName;
+        bookingName.value = memberName;
+        bookingEmail.value = memberEmail;
+      }
     }else{
-      signinError()
+      // 登入失敗or未登入，點擊 "預定行程" 跳出登入 popup
+      signinError();
+      document.getElementById("bookingPage").addEventListener("click", ()=>{
+        getSign();
+      });
     }
   })
 }else{
-  signinError()
+  signinError();
+  document.getElementById("bookingPage").addEventListener("click", ()=>{
+    getSign();
+  });
 }
 // 登入失敗or未登入，顯示"登入/註冊"文字
 function signinError(){

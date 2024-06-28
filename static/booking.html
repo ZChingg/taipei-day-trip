@@ -4,8 +4,97 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Booking</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/booking.css" />
 </head>
 <body>
-  
-</body>
+  <div class="navigation">
+    <div class="frame">
+      <h2><a href="/">台北一日遊</a></h2>
+      <div class="frame-flexend">
+        <div class="item-navigation" id="bookingPage">預定行程</div>
+        <div class="item-navigation" id="signin" onclick="getSign()" style="display:none">登入/註冊</div>
+        <div class="item-navigation" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="headline">您好，<span id="welcomeMemberName"></span>，待預訂的行程如下：</div>
+  <form class="frame__booking" id="bookingData" style="display:none;">
+    <div class="booking__section">
+      <div class="section__picture"></div>
+      <div class="section__attraction-info">
+        <div class="attraction-info__delete" onclick="getDelete()"><img src="/static/pic/delete.png"></div>
+        <div class="attraction-info__title">
+          <a id="tourLink">台北一日遊：
+            <span id="tourName"></span>
+          </a>
+        </div>
+        <div></div>
+        <div class="attraction-info__item">日期：<span id="tourDate"></span></div>
+        <div class="attraction-info__item">時間：<span id="tourTime"></span></div>
+        <div class="attraction-info__item">費用：<span id="tourPrice"></span></div>
+        <div class="attraction-info__item">地點：<span id="tourAddress"></span></div>
+      </div>
+    </div>
+    <hr>
+    <div class="booking__user-info">
+      <div class="user-info__title">您的聯絡資訊</div>
+      <div class="user-info__contact-form">
+        <div>聯絡姓名：
+          <span>
+            <input type="text" id="bookingName" required>
+          </span>
+        </div>
+        <div>聯絡信箱：
+          <span>
+            <input type="email" id="bookingEmail" required>
+          </span>
+        </div>
+        <div>手機號碼：
+          <span>
+            <input type="tel" required>
+          </span>
+        </div>
+        <div class="contact-form__alertText">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
+      </div>
+    </div>
+    <hr>
+    <div class="booking__user-info">
+      <div class="user-info__title">信用卡付款資訊</div>
+      <div class="user-info__payment">
+        <div>卡片號碼：
+          <span>
+            <input type="text" inputmode="numeric" placeholder="**** **** **** ****" pattern="[0-9]{16}" required>
+          </span>
+        </div>
+        <div>過期時間：
+          <span>
+            <input type="text" inputmode="numeric" placeholder="MM / YY" pattern="[0-9]{4}" required>
+          </span>
+        </div>
+        <div>驗證密碼：
+          <span>
+            <input type="text" inputmode="numeric" placeholder="CVV" pattern="[0-9]{3}" required>
+          </span>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="booking__user-info">
+      <div class="user-info__confirm">
+        <div class="confirm__money">
+          <strong>
+            總價：<span id="tourPayment"></span>
+          </strong>
+        </div>
+        <button class="confirm__button">確認訂購並付款</button>
+      </div>
+    </div>
+  </form>
+  <div class="frame__booking" id="noBookingData" style="display:none;">
+    <div class="booking__none">目前沒有任何待預訂的行程</div>
+  </div>
+  <footer><p>COPYRIGHT © 2021 台北一日遊</p></footer>
+  <script src="/static/js/sign.js"></script>
+  <script src="/static/js/booking.js"></script>
 </html>

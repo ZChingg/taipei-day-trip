@@ -122,6 +122,12 @@ class SignIn(BaseModel):
 	email: str
 	password: str
 
+class Booking(BaseModel):
+	attractionId: int
+	date: str
+	time: str
+	price: int
+
 SECRET_KEY = "BF6B06649E573E1F9049B869DD4F83CCBA8C250E733C9E2F8DAD2081611CAB1C"
 
 @app.post("/api/user")
@@ -157,13 +163,9 @@ def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): #
 	try:
 		token = credentials.credentials # 會從請求 header 獲取 token，若是 credentials.scheme 就是獲取 "Bearer"
 		payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-		return payload
-	except jwt.exceptions.DecodeError:
-		raise HTTPException(status_code=401, detail="Token expired")
-	except jwt.exceptions.InvalidTokenError:
-		raise HTTPException(status_code=401, detail="Invalid token")
-	except Exception as e:
-		raise HTTPException(status_code=500, detail=f"{e}")
+		return payload # token 驗證成功
+	except Exception:
+		return None # token 驗證失敗
 
 @app.get("/api/user/auth")
 async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer)): # payload 是字典類型，且值由 Depends(jwt_bearer) 提供
@@ -201,7 +203,99 @@ async def 登入會員帳戶(request: Request,
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	
+@app.get("/api/booking")
+async def 取得尚未確認下單的預定行程(payload: dict = Depends(jwt_bearer)):
+	if payload != None:
+		member_id =  payload["data"]["id"]
+		con.reconnect()
+		cursor = con.cursor()
+		cursor.execute( # 透過 token 得到使用者 id 後取其預定資料
+			"""SELECT attraction_id, date, time, price FROM booking 
+			WHERE member_id = %s 
+			ORDER BY id DESC 
+			LIMIT 1""", 
+			(member_id,)
+			)
+		data = cursor.fetchone()
+		if data:
+			attraction_id, date, time, price = data
+			cursor.execute( # 根據景點編號取對應景點資料
+				"""SELECT name, address, images 
+				FROM tripdata INNER JOIN images ON tripdata.id = images.trip_id 
+				WHERE tripdata.id = %s
+				LIMIT 1""",
+				(attraction_id,)
+				)
+			data = cursor.fetchone()
+			name, address, images = data
+			return JSONResponse({
+					"data": {
+						"attraction": {
+							"id": attraction_id,
+							"name": name,
+							"address": address,
+							"image": images
+						},
+						"date": date,
+						"time": time,
+						"price": price
+					}
+					})
+	else:
+		return JSONResponse(
+			{"error": True, "message": "未登入系統，拒絕存取"},
+			status_code=403)
 
+@app.post("/api/booking")
+async def 建立新的預定行程(
+	payload: dict = Depends(jwt_bearer),
+	data: Booking = None
+	):
+	try:
+		if payload != None:
+			member_id = payload["data"]["id"]
+			try:
+				booking_dict = data.model_dump() # 將資料轉換為字典格式
+				attraction_id = booking_dict["attractionId"]
+				date = booking_dict["date"]
+				time = booking_dict["time"]
+				price = booking_dict["price"]
+				con.reconnect()
+				cursor=con.cursor()
+				cursor.execute( # 儲存預定資料至資料庫
+					"INSERT INTO booking(member_id, attraction_id, date, time, price) VALUES(%s, %s, %s, %s, %s)",
+					(member_id, attraction_id, date, time, price)
+					)
+				con.commit()
+				return JSONResponse({"ok": True})
+			except Exception:
+				return JSONResponse(
+					{"error": True, "message": "建立失敗，輸入不正確或其他原因"},
+					status_code=400)
+		else:
+			return JSONResponse(
+				{"error": True, "message": "未登入系統，拒絕存取"},
+				status_code=403)
+	except Exception as e:
+		return JSONResponse(
+			{"error": True, "message": f"{e}"},
+			status_code=500)
+
+@app.delete("/api/booking")
+async def 刪除目前的預定行程(payload: dict = Depends(jwt_bearer)):
+	if payload != None:
+		member_id =  payload["data"]["id"]
+		con.reconnect()
+		cursor = con.cursor()
+		cursor.execute("DELETE FROM booking WHERE member_id = %s", (member_id,))
+		con.commit()
+		return JSONResponse({"ok": True})
+	else:
+		return JSONResponse(
+			{"error": True, "message": "未登入系統，拒絕存取"},
+			status_code=403)
+	
 con.close()
 
 

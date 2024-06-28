@@ -12,8 +12,8 @@
     <div class="frame">
       <h2><a href="/">台北一日遊</a></h2>
       <div class="frame-flexend">
-        <div class="item-navigation">預定行程</div>
-        <div class="item-navigation" id="signin" onclick="getSign()">登入/註冊</div>
+        <div class="item-navigation" id="bookingPage">預定行程</div>
+        <div class="item-navigation" id="signin" onclick="getSign()" style="display:none">登入/註冊</div>
         <div class="item-navigation" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
       </div>
     </div>
@@ -37,7 +37,7 @@
     <img src="static/pic/index-arrow-right.png" class="arrow-right">
   </div>
   <div class="frame-attraction"></div> <!-- appendchild 加對應 attraction -->
-  <footer id="footer">COPYRIGHT © 2021 台北一日遊</footer>
+  <footer id="footer"><p>COPYRIGHT © 2021 台北一日遊</p></footer>
   <!-- popup menu -->
   <div class="wrapper-popup"> <!-- 黑色部分 -->
      <!-- 登入帳號 Signin -->

@@ -12,7 +12,7 @@ function changeToAfternoon(){
   afternoonDiv.style.display = "block";
 }
 
-// 獲取 attractionId 數字抓取對應資訊
+// 獲取 attractionId 數字抓取對應景點資訊
 let path = window.location.pathname; // 獲取path: /attraction/10
 let attractionId = path.split("/").pop(); // pop(): 移除陣列最後一個值(縮短陣列長度)，並將 "值回傳"
 // 抓資料
@@ -103,7 +103,7 @@ fetch(`/api/attraction/${attractionId}`)
       dot[counter-1].classList.add("active");
     }
 
-    // 避免 html 直接用 onclick = plsuSlides()，但函式在頁面加載時還尚未被定義問題
+    // 改用 addEventListener 避免 html 直接用 onclick = plsuSlides()，但函式在頁面加載時還尚未被定義問題
     document.querySelector('.prev').addEventListener("click", ()=>{
       plusSlides(-1);
     });
@@ -114,3 +114,43 @@ fetch(`/api/attraction/${attractionId}`)
     document.location.href="/" // 若數字沒資料就導回首頁
   }
 });
+
+// 點擊預定按鈕建立新行程
+function getBooking(event){
+  event.preventDefault();
+  token = localStorage.getItem("token");
+  if(token){
+    let date = document.getElementById("date").value;
+    let time = document.querySelector("input[name='time']:checked").value; // 雙/單引號內不能有雙/單引號
+    let price = 2000;
+    if(time == "afternoon"){
+      price = 2500;
+    }
+    let data = {
+      attractionId: attractionId,
+      date: date,
+      time: time,
+      price: price,
+    }
+    fetch("/api/booking", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    }).then(function(response){ 
+      return response.json();
+    }).then(function(data){
+      // 若成功則導連至 booking 頁面
+      if(data.ok){
+        document.location.href="/booking"
+      // 若失敗則跳出登入 popup 
+      }else{
+        getSign();
+      }
+    })
+  }else{
+    getSign();
+  }
+}
