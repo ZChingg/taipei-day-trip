@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap');
+
+*{
+  margin: 0;
+}
+h1{
+    font-size: 28px;
+    line-height: 24px;
+    font-weight: 700;
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
+h2{
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 700;
+  padding-left: 10px;
+}
+h3{
+  font-size: 24px;
+  line-height: 24px;
+  font-weight: 700;
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+body{ /* 設定的值會套用至所有文字 */
+  font-size: 16px;
+  line-height: 14px;
+  font-weight: 400;
+  color: #666666;
+  font-family: "Noto Sans TC", sans-serif; /* 若無法使用首個字型，則指定無襯線的隨意內建字型(通用字) */
+  background-color: white;
+  /* display: flex; 
+  flex-direction: column;
+  min-height: 100vh; */
+}
+a:any-link{
+  color: #448899;
+  text-decoration: none; /* 不要有底線 */ 
+}
+hr{
+  border: 1px solid #E8E8E8;
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+.navigation{
+  display: flex; /* 下一層次的項目水平排列 */ 
+  align-items: center; /* 垂直對齊 */
+  position: sticky;
+  top: 0;
+  height: 54px;
+  background-color: white;
+  z-index: 1;
+}
+.frame{
+  display: flex;
+  align-items: center; 
+  margin: auto; /* 常用於置中元素，將剩下的空間平均分配給四周 */
+  width: 1200px;
+  height: 34px;
+}
+.frame-flexend{
+  display: flex;
+  justify-content: flex-end;
+  flex: auto;
+}
+.item-navigation{
+  flex: none;
+  padding: 10px;
+  font-weight: 500;
+}
+.item-navigation:hover{
+  color: black;
+  cursor: pointer;
+}
+.frame__booking{
+  width: 1200px;
+  margin: 30px auto 40px auto;
+}
+.headline{
+  box-sizing: border-box;
+  width: 1000px;
+  padding: 0 10px;
+  height: 27px;
+  margin: auto;
+  font-size: 19px;
+  line-height: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  margin-top: 40px;
+}
+.booking__section{
+  display: flex;
+  box-sizing: border-box;
+  width: 1000px;
+  padding: 0 10px;
+  height: 200px;
+  margin: 0 auto 40px auto;
+}
+.section__picture{
+  width: 250px;
+  height: 200px;
+  background-size: cover; 
+  background-position: center;
+}
+.section__attraction-info{
+  margin: 0 0 30px 30px;
+  flex: auto;
+  display: grid;
+  grid-gap: 10px; 
+  grid-template-columns: 90%;
+  grid-template-rows: auto 0px auto auto auto auto;
+  align-items: center;
+  position: relative;
+}
+.attraction-info__title{
+  display: flex;
+  color: #448899;
+  font-weight: 700;
+  line-height: 24px;
+  align-items: center;
+}
+.attraction-info__item{
+  line-height: 24px;
+}
+.attraction-info__delete{
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+}
+.booking__user-info{
+  box-sizing: border-box;
+  width: 1000px;
+  padding: 0 10px;
+  margin: 40px auto;
+}
+.user-info__title{
+  height: 24px;
+  font-size: 19px;
+  line-height: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.user-info__contact-form{
+  display: grid;
+  grid-gap: 15px; 
+  grid-template-columns: 100%;
+  grid-template-rows: 38px 38px 38px auto;
+  align-items: center;
+}
+.contact-form__alertText{
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 23.17px;
+}
+input{
+  box-sizing: border-box;
+  width: 200px;
+  height: 38px;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #E8E8E8;
+  outline: none;
+  border-radius: 5px;
+  font-size: 16px;
+  line-height: 14px;
+  font-weight: 500;
+}
+.user-info__payment{
+  display: grid;
+  grid-gap: 15px; 
+  grid-template-columns: 100%;
+  grid-template-rows: repeat(3, 38px);
+  align-items: center;
+}
+.user-info__confirm{
+  width: 100%;
+  text-align: right;
+}
+.confirm__money{
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+.confirm__button{
+  box-sizing: border-box;
+  margin: 22px 0;
+  border-radius: 5px;
+  background-color: #448899;
+  width: 173px;
+  height: 36px;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 16px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.confirm__button:hover{
+  background-color: #3E7E8E;
+}
+.booking__none{
+  box-sizing: border-box;
+  width: 1000px;
+  padding: 0 10px;
+  margin: auto;
+}
+footer{
+  display: flex;
+  justify-content: center;
+  height: 104px; 
+  /* min-height: 100vh; */
+  background-color: #666666;
+}
+footer p{
+  display: flex;
+  align-items: center;
+  margin-top: 40px;
+  height: 24px;
+  font-weight: 700;
+  color: white;
+}
+
+@media(min-width:690px) and (max-width:1199px){
+  hr, .frame, .frame__booking{
+    width: 100%;
+  }
+  .headline, .booking__section, .booking__user-info, .booking__none{
+    width: calc(100%*(5/6));
+  }
+}
+
+
+@media (max-width:689px){
+  hr, .frame, .frame__booking, .headline, 
+  .section__picture, .booking__user-info, .booking__none{
+    width: 100%;
+  }
+  .booking__section{
+    display: block;
+    width: 100%;
+    padding: 0 10px;
+    height: auto;
+    margin: 0 auto 60px auto;
+  }
+  .section__attraction-info{
+    margin: 30px 0;
+  }
+  .attraction-info__delete{
+    top: 100%;
+    bottom: 0;
+  }
+  .contact-form__alertText{
+    margin-top: 5px;
+  }
+}
