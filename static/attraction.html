@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Attraction</title>
   <link rel="stylesheet" type="text/css" href="/static/css/attraction.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/popup.css" />
 </head>
 <body>
   <div class="navigation">
@@ -34,21 +33,21 @@
       <h3 id ="name"></h3>
       <div class="body" id = category></div>
       <form class="bookingForm" onsubmit="getBooking(event)">
-        <div class="body-bold">訂購導覽行程</div>
+        <div><strong>訂購導覽行程</strong></div>
         <div class="infos-content">以此景點為中心的一日行程，帶您探索城市角落故事</div>
         <div class="group">
-          <div class="body-bold">選擇日期：</div>
+          <div><strong>選擇日期：</strong></div>
           <input type="date" class="input-date" id="date" required>
         </div>
         <div class="group">
-          <div class="body-bold">選擇時間：</div>
+          <div><strong>選擇時間：</strong></div>
           <!-- 以相同的 name 建立單選按鈕組，這樣就無法複選 -->
           <!-- 需設置 value 以回傳使用者選擇 -->
           <input type="radio" name="time" value="morning" checked onclick="changeToMorning();">上半天
           <input type="radio" name="time" value="afternoon" onclick="changeToAfternoon();">下半天
         </div>
         <div class="group">
-          <div class="body-bold">導覽費用：</div>
+          <div><strong>導覽費用：</strong></div>
           <div id="morning">新台幣 2000 元</div>
           <div id="afternoon" style="display: none;">新台幣 2500 元</div>
         </div>

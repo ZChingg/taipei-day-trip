@@ -28,8 +28,11 @@ if(token){
         bookingName.value = memberName;
         bookingEmail.value = memberEmail;
       }
-    }else{
+    }else{ 
       // 登入失敗or未登入，點擊 "預定行程" 跳出登入 popup
+      if(document.location.pathname == "/thankyou"){
+        document.location.href = "/"
+      }
       signinError();
       document.getElementById("bookingPage").addEventListener("click", ()=>{
         getSign();
@@ -37,6 +40,9 @@ if(token){
     }
   })
 }else{
+  if(document.location.pathname == "/thankyou"){
+    document.location.href = "/"
+  }
   signinError();
   document.getElementById("bookingPage").addEventListener("click", ()=>{
     getSign();

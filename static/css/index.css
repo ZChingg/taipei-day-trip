@@ -1,73 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap');
-*{
-    margin: 0;
-}
-h1{
-    font-size: 28px;
-    line-height: 24px;
-    font-weight: 700;
-    margin-block-start: 0;
-    margin-block-end: 0;
-}
-h2{
-    font-size: 30px;
-    line-height: 34px;
-    font-weight: 700;
-    padding-left: 10px;
-}
-h3{
-    font-size: 24px;
-    line-height: 24px;
-    font-weight: 700;
-    margin-block-start: 0;
-    margin-block-end: 0;
-  }
-body{
-    font-size: 16px;
-    line-height: 14px;
-    font-weight: 400;
-    color: #666666;
-    font-family: "Noto Sans TC", sans-serif;
-    background-color: white;
-}
-.body-bold{
-    font-weight: 700;
-}
-a:-webkit-any-link{
-    color: #448899;
-    text-decoration: none;
-}
+@import "/static/css/conponent.css";
 
-.navigation{
-    display: flex;
-    align-items: center; /* 垂直對齊 */
-    position: sticky;
-    top: 0;
-    height: 54px;
-    background-color: white;
-    z-index: 1;
-}
-.frame{
-    display: flex;
-    align-items: center; 
-    margin: auto; /* 常用於置中元素，將剩下的空間平均分配給四周 */
-    width: 1200px;
-    height: 34px;
-}
-.frame-flexend{
-    display: flex;
-    justify-content: flex-end;
-    flex: auto;
-}
-.item-navigation{
-    flex: none;
-    padding: 10px;
-    font-weight: 500;
-}
-.item-navigation:hover{
-    color: black;
-    cursor: pointer;
-}
 .welcome{
     background-image: url("/static/pic/welcome.png");
     background-size: cover; /* 讓圖片覆蓋整個容器，並保留圖片比例 */
@@ -196,8 +128,8 @@ a:-webkit-any-link{
 }
 .attraction{
     background-image: url();
-    background-size: cover; /* 讓圖片覆蓋整個容器，並保留圖片比例 */
-    background-position: center; /* 確保圖片置中 */
+    background-size: cover;
+    background-position: center;
     height: 197px;
     border-radius: 5px 5px 0 0;
 }
@@ -247,21 +179,6 @@ a:-webkit-any-link{
     height: 25px;
     justify-content: flex-end;
     flex:auto;
-}
-footer{
-    display: flex;
-    justify-content: center;
-    height: 104px; 
-    /* min-height: 100vh; */
-    background-color: #666666;
-}
-footer p{
-    display: flex;
-    align-items: center;
-    margin-top: 40px;
-    height: 24px;
-    font-weight: 700;
-    color: white;
 }
 
 @media (min-width:600px) and (max-width:1199px){
