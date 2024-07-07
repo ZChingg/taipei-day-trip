@@ -23,7 +23,7 @@
     <div class="booking__section">
       <div class="section__picture"></div>
       <div class="section__attraction-info">
-        <div class="attraction-info__delete" onclick="getDelete()"><img src="/static/pic/delete.png"></div>
+        <div class="attraction-info__delete" onclick="getDelete(true)"><img src="/static/pic/delete.png"></div>
         <div class="attraction-info__title">
           <a id="tourLink">台北一日遊：
             <span id="tourName"></span>
@@ -52,7 +52,7 @@
         </div>
         <div>手機號碼：
           <span>
-            <input type="tel" required>
+            <input type="tel" id="bookingTel" required>
           </span>
         </div>
         <div class="contact-form__alertText">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
@@ -61,33 +61,27 @@
     <hr>
     <div class="booking__user-info">
       <div class="user-info__title">信用卡付款資訊</div>
-      <div class="user-info__payment">
-        <div>卡片號碼：
-          <span>
-            <input type="text" inputmode="numeric" placeholder="**** **** **** ****" pattern="[0-9]{16}" required>
-          </span>
+      <div class="user-info__payment-form">
+        <div class="form-group">
+          <label for="card-number">卡片號碼：</label>
+          <div class="tpfield" id="card-number"></div>
         </div>
-        <div>過期時間：
-          <span>
-            <input type="text" inputmode="numeric" placeholder="MM / YY" pattern="[0-9]{4}" required>
-          </span>
+        <div class="form-group">
+          <label for="card-expiration-date">過期時間：</label>
+          <div class="tpfield" id="card-expiration-date"></div>
         </div>
-        <div>驗證密碼：
-          <span>
-            <input type="text" inputmode="numeric" placeholder="CVV" pattern="[0-9]{3}" required>
-          </span>
+        <div class="form-group">
+          <label for="card-ccv">驗證密碼：</label>
+          <div class="tpfield" id="card-ccv"></div>
         </div>
       </div>
     </div>
     <hr>
     <div class="booking__user-info">
       <div class="user-info__confirm">
-        <div class="confirm__money">
-          <strong>
-            總價：<span id="tourPayment"></span>
-          </strong>
-        </div>
-        <button class="confirm__button">確認訂購並付款</button>
+        <p class="confirm__error-message"></p>
+        <p><strong>總價：<span id="tourPayment"></span></strong></p>
+        <button type="submit" class="confirm__button">確認訂購並付款</button>
       </div>
     </div>
   </form>
@@ -95,6 +89,7 @@
     <div class="booking__none">目前沒有任何待預訂的行程</div>
   </div>
   <footer><p>COPYRIGHT © 2021 台北一日遊</p></footer>
+  <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.14.0"></script> <!-- TapPay -->
   <script src="/static/js/sign.js"></script>
   <script src="/static/js/booking.js"></script>
 </html>

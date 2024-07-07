@@ -1,77 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap');
+@import "/static/css/conponent.css";
 
-*{
-  margin: 0;
-}
-h1{
-    font-size: 28px;
-    line-height: 24px;
-    font-weight: 700;
-    margin-block-start: 0;
-    margin-block-end: 0;
-  }
-h2{
-  font-size: 30px;
-  line-height: 34px;
-  font-weight: 700;
-  padding-left: 10px;
-}
-h3{
-  font-size: 24px;
-  line-height: 24px;
-  font-weight: 700;
-  margin-block-start: 0;
-  margin-block-end: 0;
-}
-body{ /* 設定的值會套用至所有文字 */
+input{
+  box-sizing: border-box;
+  width: 200px;
+  height: 38px;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #E8E8E8;
+  outline: none;
+  border-radius: 5px;
   font-size: 16px;
   line-height: 14px;
-  font-weight: 400;
-  color: #666666;
-  font-family: "Noto Sans TC", sans-serif; /* 若無法使用首個字型，則指定無襯線的隨意內建字型(通用字) */
-  background-color: white;
-  /* display: flex; 
-  flex-direction: column;
-  min-height: 100vh; */
-}
-a:any-link{
-  color: #448899;
-  text-decoration: none; /* 不要有底線 */ 
-}
-hr{
-  border: 1px solid #E8E8E8;
-  margin-block-start: 0;
-  margin-block-end: 0;
-}
-.navigation{
-  display: flex; /* 下一層次的項目水平排列 */ 
-  align-items: center; /* 垂直對齊 */
-  position: sticky;
-  top: 0;
-  height: 54px;
-  background-color: white;
-  z-index: 1;
-}
-.frame{
-  display: flex;
-  align-items: center; 
-  margin: auto; /* 常用於置中元素，將剩下的空間平均分配給四周 */
-  width: 1200px;
-  height: 34px;
-}
-.frame-flexend{
-  display: flex;
-  justify-content: flex-end;
-  flex: auto;
-}
-.item-navigation{
-  flex: none;
-  padding: 10px;
   font-weight: 500;
-}
-.item-navigation:hover{
-  color: black;
-  cursor: pointer;
 }
 .frame__booking{
   width: 1200px;
@@ -157,19 +97,6 @@ hr{
   font-weight: 700;
   line-height: 23.17px;
 }
-input{
-  box-sizing: border-box;
-  width: 200px;
-  height: 38px;
-  padding: 10px;
-  background-color: white;
-  border: 1px solid #E8E8E8;
-  outline: none;
-  border-radius: 5px;
-  font-size: 16px;
-  line-height: 14px;
-  font-weight: 500;
-}
 .user-info__payment{
   display: grid;
   grid-gap: 15px; 
@@ -181,11 +108,13 @@ input{
   width: 100%;
   text-align: right;
 }
-.confirm__money{
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: right;
+.user-info__confirm p{
+  box-sizing: border-box;
+  padding: 5px 0;
+}
+.confirm__error-message{
+  color: darkred;
+  font-weight: 700;
 }
 .confirm__button{
   box-sizing: border-box;
@@ -212,21 +141,36 @@ input{
   padding: 0 10px;
   margin: auto;
 }
-footer{
-  display: flex;
-  justify-content: center;
-  height: 104px; 
-  /* min-height: 100vh; */
-  background-color: #666666;
+
+/* for TapPay */
+.user-info__payment-form{
+  display: grid;
+  gap: 15px;
 }
-footer p{
+.form-group{
   display: flex;
   align-items: center;
-  margin-top: 40px;
-  height: 24px;
-  font-weight: 700;
-  color: white;
 }
+.tpfield{
+  box-sizing: border-box;
+  width: 200px;
+  height: 38px;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #E8E8E8;
+  border-radius: 5px;
+}
+/*
+.tappay-field-focus{
+  border-color: #66afe9;
+}
+.has-error{
+  border-color: #843534;
+}
+.has-success{
+  border-color:green;
+}
+*/
 
 @media(min-width:690px) and (max-width:1199px){
   hr, .frame, .frame__booking{

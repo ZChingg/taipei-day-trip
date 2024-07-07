@@ -1,0 +1,28 @@
+@import "/static/css/conponent.css";
+
+.frame__order_msg{
+  width: 1200px;
+  margin: 40px auto 60px auto;
+  text-align: center;
+}
+.order-msg-headline{
+  font-size: 19px;
+  line-height: 16px;
+  font-weight: 700;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+}
+.order-msg-content{
+  margin: 40px 0;
+}
+footer{
+  height: 100vh;
+}
+
+
+@media (max-width:1199px){
+  .frame__order_msg{
+    width: 100%;
+  }
+}

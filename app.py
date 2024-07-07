@@ -5,7 +5,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 import mysql.connector
 import jwt
-import datetime
+import time, datetime
+import requests
 
 app=FastAPI() #uvicorn app:app --reload
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -128,6 +129,32 @@ class Booking(BaseModel):
 	time: str
 	price: int
 
+# 下訂單
+class Attraction(BaseModel):
+    id: int
+    name: str
+    address: str
+    image: str
+
+class Trip(BaseModel):
+    attraction: Attraction
+    date: str
+    time: str
+
+class Contact(BaseModel):
+    name: str
+    email: str
+    phone: str
+
+class Order(BaseModel):
+    price: int
+    trip: Trip
+    contact: Contact
+
+class PaymentRequest(BaseModel):
+    prime: str
+    order: Order
+
 SECRET_KEY = "BF6B06649E573E1F9049B869DD4F83CCBA8C250E733C9E2F8DAD2081611CAB1C"
 
 @app.post("/api/user")
@@ -169,7 +196,8 @@ def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): #
 
 @app.get("/api/user/auth")
 async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer)): # payload 是字典類型，且值由 Depends(jwt_bearer) 提供
-    return JSONResponse({"data": payload["data"]})
+	if payload:
+		return JSONResponse({"data": payload["data"]})
 
 @app.put("/api/user/auth")
 async def 登入會員帳戶(request: Request,
@@ -211,7 +239,7 @@ async def 取得尚未確認下單的預定行程(payload: dict = Depends(jwt_be
 		con.reconnect()
 		cursor = con.cursor()
 		cursor.execute( # 透過 token 得到使用者 id 後取其預定資料
-			"""SELECT attraction_id, date, time, price FROM booking 
+			"""SELECT attraction_id, date, time, price FROM cart 
 			WHERE member_id = %s 
 			ORDER BY id DESC 
 			LIMIT 1""", 
@@ -264,7 +292,7 @@ async def 建立新的預定行程(
 				con.reconnect()
 				cursor=con.cursor()
 				cursor.execute( # 儲存預定資料至資料庫
-					"INSERT INTO booking(member_id, attraction_id, date, time, price) VALUES(%s, %s, %s, %s, %s)",
+					"INSERT INTO cart(member_id, attraction_id, date, time, price) VALUES(%s, %s, %s, %s, %s)",
 					(member_id, attraction_id, date, time, price)
 					)
 				con.commit()
@@ -288,14 +316,164 @@ async def 刪除目前的預定行程(payload: dict = Depends(jwt_bearer)):
 		member_id =  payload["data"]["id"]
 		con.reconnect()
 		cursor = con.cursor()
-		cursor.execute("DELETE FROM booking WHERE member_id = %s", (member_id,))
+		cursor.execute("DELETE FROM cart WHERE member_id = %s", (member_id,))
 		con.commit()
 		return JSONResponse({"ok": True})
 	else:
 		return JSONResponse(
 			{"error": True, "message": "未登入系統，拒絕存取"},
 			status_code=403)
-	
+
+def get_order_number(member_id):
+	# 訂單編號 = YYMMDDHHMMSS + 時間戳後6位 + member id
+	order_number = datetime.datetime.now().strftime("%Y%m%d%H%M%S") + str(time.time()).replace('.', '')[-6:] + str(member_id)
+	return order_number
+
+def insert_payment_data(cursor, order_id, result):
+    sql = """INSERT INTO payment
+    (orders_id, status, msg, amount, acquirer, currency, rec_trade_id, bank_transaction_id, 
+    order_number, auth_code, card_issuer, card_funding, card_type, card_level, card_country, 
+    card_last_four, card_bin_code, card_bank_id, card_country_code, transaction_time,
+    bank_transaction_start_time, bank_transaction_end_time, bank_result_code, bank_result_msg, card_identifier, 
+    merchant_id, is_rba_verified, transaction_method, transaction_method_reference)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+    cursor.execute(sql, (
+		order_id,
+        result["status"],
+        result["msg"],
+        result["amount"],
+        result["acquirer"],
+        result["currency"],
+        result["rec_trade_id"],
+        result["bank_transaction_id"],
+        result["order_number"],
+        result["auth_code"],
+        result["card_info"]["issuer"], 
+        result["card_info"]["funding"], 
+        result["card_info"]["type"],
+        result["card_info"]["level"], 
+        result["card_info"]["country"], 
+        result["card_info"]["last_four"],
+        result["card_info"]["bin_code"], 
+        result["card_info"]["bank_id"], 
+        result["card_info"]["country_code"],
+        result["transaction_time_millis"],
+        result["bank_transaction_time"]["start_time_millis"], 
+        result["bank_transaction_time"]["end_time_millis"],
+        result["bank_result_code"],
+        result["bank_result_msg"],
+        result["card_identifier"],
+        result["merchant_id"],
+        result["is_rba_verified"],
+        result["transaction_method_details"]["transaction_method"], 
+        result["transaction_method_details"]["transaction_method_reference"]
+    ))
+
+@app.post("/api/orders")
+async def 建立新的訂單並完成付款程序(
+	payload: dict = Depends(jwt_bearer),
+	data: PaymentRequest = None):
+	try:
+		if payload != None:
+			member_id = payload["data"]["id"]
+			try:
+				# 儲存訂單資料至資料庫
+				orders_dict = data.model_dump()
+				attraction_id = orders_dict["order"]["trip"]["attraction"]["id"]
+				date = orders_dict["order"]["trip"]["date"]
+				time = orders_dict["order"]["trip"]["time"]
+				price = orders_dict["order"]["price"]
+				name = orders_dict["order"]["contact"]["name"]
+				email = orders_dict["order"]["contact"]["email"]
+				phone = orders_dict["order"]["contact"]["phone"]
+				payment = "UNPAID"
+				con.reconnect()
+				cursor=con.cursor()
+				cursor.execute(
+					"""INSERT INTO orders(member_id, attraction_id, date, time, price, name, email, phone, payment) 
+					VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+					(member_id, attraction_id, date, time, price, name, email, phone, payment)
+					)
+				con.commit()
+				# 取得剛新增(最後一行插入)的訂單的 ID
+				order_id = cursor.lastrowid 
+				# 取得唯一的訂單編號
+				order_number = get_order_number(member_id)
+
+				# 發送 POST 請求至 TapPay Pay By Prime API
+				tappay_headers = {
+					"Content-Type": "application/json",
+                    "x-api-key": "partner_eYAXWT2z0LtyzroXr7C5FdSR2j1TOVu7exnhLQKVUv448pnpDOXD50IR"
+					}
+				tappay_json = {
+					"prime": data.prime,
+					"partner_key": "partner_eYAXWT2z0LtyzroXr7C5FdSR2j1TOVu7exnhLQKVUv448pnpDOXD50IR",
+					"merchant_id": "ZChingg_CTBC",
+					"details": "台北市區一日遊",
+					"amount": price,
+					"order_number": order_number,
+					"cardholder": {
+						"phone_number": phone,
+						"name": name,
+						"email": email
+						},
+					"remember": False
+					}
+				# requests 套件發送請求後，會收到回傳的 Response 物件
+				tappay_response = requests.post(
+					"https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime", 
+					headers=tappay_headers, 
+					json=tappay_json
+					)
+				# 取得 Pay By Prime API json 資料
+				result = tappay_response.json() 
+				# 若成功付款
+				if result['status'] == 0:
+					# 更新 orders 資料表付款狀態
+					cursor.execute("UPDATE orders SET payment = 'PAID' WHERE id = %s", (order_id,))
+					# 新增付款資訊至 payment 資料表
+					insert_payment_data(cursor, order_id, result)
+					con.commit()
+					return JSONResponse(
+						{
+							"data": {
+								"number": order_number,
+								"payment": {
+									"status": result["status"],
+									"message": "付款成功"
+								}
+							}
+						})
+				# 若失敗
+				else:	
+					# 新增付款資訊至 payment 資料表
+					insert_payment_data(cursor, order_id, result)
+					return JSONResponse(
+						{
+							"data": {
+								"number": order_number,
+								"payment": {
+									"status": result["status"],
+									"message": "付款失敗"
+								}
+							}
+						})
+			except Exception as e:
+				return JSONResponse(
+					{"error": True, "message": f"{e}"},
+					status_code=400)
+		else:
+			return JSONResponse(
+				{"error": True, "message": "未登入系統，拒絕存取"},
+				status_code=403)
+	except Exception as e:
+		return JSONResponse(
+			{"error": True, "message": f"{e}"},
+			status_code=500)
+
+
+
+
 con.close()
 
 
