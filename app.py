@@ -3,6 +3,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
+from dotenv import load_dotenv
+import os
 import mysql.connector
 import jwt
 import time, datetime
@@ -11,11 +13,21 @@ import requests
 app=FastAPI() #uvicorn app:app --reload
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# 使用 .env
+load_dotenv() # take environment variables from .env.
+mysql_user = os.getenv("MYSQL_USER")
+mysql_password = os.getenv("MYSQL_PASSWORD")
+mysql_host = os.getenv("MYSQL_HOST")
+mysql_db = os.getenv("MYSQL_DB")
+jwt_secret_key = os.getenv("JWT_SECRET_KEY")
+tappay_partner_key  = os.getenv("TAPPAY_PARTNER_KEY")
+
+# 連接 mysql 資料庫
 con = mysql.connector.connect(
-    user = "root",
-    password = "a32128466",
-    host = "localhost",
-    database = "trip"
+    user = mysql_user,
+    password = mysql_password,
+    host = mysql_host,
+    database = mysql_db
 )
 print("資料庫連線成功")
 
@@ -155,7 +167,6 @@ class PaymentRequest(BaseModel):
     prime: str
     order: Order
 
-SECRET_KEY = "BF6B06649E573E1F9049B869DD4F83CCBA8C250E733C9E2F8DAD2081611CAB1C"
 
 @app.post("/api/user")
 async def 註冊一個新的會員(request: Request,
@@ -189,7 +200,7 @@ security = HTTPBearer()
 def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): # credentials 是 HTTPAuthorizationCredentials 類型（包含著 scheme、credentials），且依賴於 security
 	try:
 		token = credentials.credentials # 會從請求 header 獲取 token，若是 credentials.scheme 就是獲取 "Bearer"
-		payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+		payload = jwt.decode(token, jwt_secret_key, algorithms=["HS256"])
 		return payload # token 驗證成功
 	except Exception:
 		return None # token 驗證失敗
@@ -220,7 +231,7 @@ async def 登入會員帳戶(request: Request,
 					"email": email
 					}
 			}
-			token = jwt.encode(payload, SECRET_KEY, algorithm = "HS256")
+			token = jwt.encode(payload, jwt_secret_key, algorithm = "HS256")
 			return JSONResponse(
 				{"token": token}) 
 		else:
@@ -403,11 +414,11 @@ async def 建立新的訂單並完成付款程序(
 				# 發送 POST 請求至 TapPay Pay By Prime API
 				tappay_headers = {
 					"Content-Type": "application/json",
-                    "x-api-key": "partner_eYAXWT2z0LtyzroXr7C5FdSR2j1TOVu7exnhLQKVUv448pnpDOXD50IR"
+                    "x-api-key": tappay_partner_key
 					}
 				tappay_json = {
 					"prime": data.prime,
-					"partner_key": "partner_eYAXWT2z0LtyzroXr7C5FdSR2j1TOVu7exnhLQKVUv448pnpDOXD50IR",
+					"partner_key": tappay_partner_key,
 					"merchant_id": "ZChingg_CTBC",
 					"details": "台北市區一日遊",
 					"amount": price,
