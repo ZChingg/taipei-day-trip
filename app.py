@@ -9,6 +9,7 @@ import mysql.connector
 import jwt
 import time, datetime
 import requests
+import bcrypt
 
 app=FastAPI() #uvicorn app:app --reload
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -100,7 +101,7 @@ async def 根據景點編號取得景點資料(request: Request,
 			return JSONResponse(
 				{"error": True, "message": "景點編號不正確"},
 				status_code=400)
-	except Exception as e: # 例外處理，Exception: 通用的異常類型(不知錯誤型別)
+	except Exception as e: 
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
@@ -167,7 +168,23 @@ class PaymentRequest(BaseModel):
     prime: str
     order: Order
 
+# 密碼以 bcrypt 加密
+def hash_password(password):
+	salt = bcrypt.gensalt()
+	hash_password = bcrypt.hashpw(password.encode("utf-8"), salt)
+	return hash_password.decode("utf-8")
 
+# HTTP Bearer token authentication (JWT驗證)
+security = HTTPBearer()
+
+def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): # credentials 是 HTTPAuthorizationCredentials 類型（包含著 scheme、credentials），且依賴於 security
+	try:
+		token = credentials.credentials # 會從請求 header 獲取 token，若是 credentials.scheme 就是獲取 "Bearer"
+		payload = jwt.decode(token, jwt_secret_key, algorithms=["HS256"])
+		return payload # token 驗證成功
+	except Exception:
+		return None # token 驗證失敗
+	
 @app.post("/api/user")
 async def 註冊一個新的會員(request: Request,
 				   data: SignUp = None):
@@ -185,7 +202,8 @@ async def 註冊一個新的會員(request: Request,
 				{"error": True, "message": "註冊失敗，重複的 Email 或其他原因"},
 				status_code=400)
 		else:
-			cursor.execute("INSERT INTO member(name, email, password) VALUES(%s, %s, %s)", (name, email, password))
+			hashed_password = hash_password(password)
+			cursor.execute("INSERT INTO member(name, email, password) VALUES(%s, %s, %s)", (name, email, hashed_password))
 			con.commit()
 			return JSONResponse(
 				{"ok": True})
@@ -193,17 +211,6 @@ async def 註冊一個新的會員(request: Request,
 		return JSONResponse(
 			{"error": True, "message": f"{e}"},
 			status_code=500)
-
-# HTTP Bearer token authentication (JWT驗證)
-security = HTTPBearer()
-
-def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): # credentials 是 HTTPAuthorizationCredentials 類型（包含著 scheme、credentials），且依賴於 security
-	try:
-		token = credentials.credentials # 會從請求 header 獲取 token，若是 credentials.scheme 就是獲取 "Bearer"
-		payload = jwt.decode(token, jwt_secret_key, algorithms=["HS256"])
-		return payload # token 驗證成功
-	except Exception:
-		return None # token 驗證失敗
 
 @app.get("/api/user/auth")
 async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer)): # payload 是字典類型，且值由 Depends(jwt_bearer) 提供
@@ -214,15 +221,17 @@ async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer))
 async def 登入會員帳戶(request: Request,
 				 data: SignIn = None): 
 	try:
-		signin_dict = data.model_dump() # 將資料轉換為字典格式
+		signin_dict = data.model_dump() 
 		email = signin_dict["email"]
 		password = signin_dict["password"]
 		con.reconnect()
 		cursor = con.cursor()
-		cursor.execute("SELECT id, name, email FROM member WHERE email = %s and password = %s", (email, password))
+		cursor.execute("SELECT * FROM member WHERE email = %s", (email, ))
 		data = cursor.fetchone()
-		if data:
-			id, name, email = data
+		hash_password = data[3]
+		print(hash_password)
+		if data and bcrypt.checkpw(password.encode("utf-8"), hash_password.encode("utf-8")):
+			id, name, email, _ = data
 			payload = {
 				"exp": (datetime.datetime.now()+datetime.timedelta(days=1)).timestamp(), # 現在時間+一天後轉為時間戳
 				"data": {
@@ -238,7 +247,7 @@ async def 登入會員帳戶(request: Request,
 			return JSONResponse(
 				{"error": True, "message": "登入失敗，帳號或密碼錯誤或其他原因"},
 				status_code=400)
-	except Exception as e: # 例外處理，Exception: 通用的異常類型(不知錯誤型別)
+	except Exception as e: 
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
@@ -295,7 +304,7 @@ async def 建立新的預定行程(
 		if payload != None:
 			member_id = payload["data"]["id"]
 			try:
-				booking_dict = data.model_dump() # 將資料轉換為字典格式
+				booking_dict = data.model_dump()
 				attraction_id = booking_dict["attractionId"]
 				date = booking_dict["date"]
 				time = booking_dict["time"]
@@ -335,11 +344,13 @@ async def 刪除目前的預定行程(payload: dict = Depends(jwt_bearer)):
 			{"error": True, "message": "未登入系統，拒絕存取"},
 			status_code=403)
 
+# 為每筆訂單建立唯一的訂單編號
 def get_order_number(member_id):
 	# 訂單編號 = YYMMDDHHMMSS + 時間戳後6位 + member id
 	order_number = datetime.datetime.now().strftime("%Y%m%d%H%M%S") + str(time.time()).replace('.', '')[-6:] + str(member_id)
 	return order_number
 
+# 將付款資料存入資料庫
 def insert_payment_data(cursor, order_id, result):
     sql = """INSERT INTO payment
     (orders_id, status, msg, amount, acquirer, currency, rec_trade_id, bank_transaction_id, 
