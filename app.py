@@ -5,7 +5,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
-import mysql.connector
+import mysql.connector.pooling
 import jwt
 import time, datetime
 import requests
@@ -23,21 +23,23 @@ mysql_db = os.getenv("MYSQL_DB")
 jwt_secret_key = os.getenv("JWT_SECRET_KEY")
 tappay_partner_key  = os.getenv("TAPPAY_PARTNER_KEY")
 
-# 連接 mysql 資料庫
-con = mysql.connector.connect(
-    user = mysql_user,
-    password = mysql_password,
-    host = mysql_host,
-    database = mysql_db
-)
-print("資料庫連線成功")
+# 使用 connection pool 連接 mysql 資料庫
+dbconfig = {
+	"user": mysql_user,
+    "password": mysql_password,
+    "host": mysql_host,
+    "database": mysql_db
+}
+pool = mysql.connector.pooling.MySQLConnectionPool(pool_name = "mypool",
+												   pool_size = 15,
+												   **dbconfig)
 
 @app.get("/api/attractions")
 async def 取得景點資料列表(request: Request,
 					 page: int = Query(0, ge=0), # ge=0 為 greater than or equal to 0
 					 keyword: str = Query(None)):
 	try:
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor(dictionary=True) # 預設回傳資料為tuple[(1,平安鐘)]，轉成用包含字典的列表[{'id':1,'name':平安鐘}]
 		if keyword:
 			sql = """SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata 
@@ -80,12 +82,14 @@ async def 取得景點資料列表(request: Request,
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	finally:
+		con.close()
 
 @app.get("/api/attraction/{attractionId}")
 async def 根據景點編號取得景點資料(request: Request,
 					 attractionId: int):
 	try:
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor(dictionary=True) # 預設回傳資料為tuple[(1,平安鐘)]，轉成用包含字典的列表[{'id':1,'name':平安鐘}]
 		sql =  """SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata 
 		INNER JOIN images ON tripdata.id = images.trip_id 
@@ -105,11 +109,13 @@ async def 根據景點編號取得景點資料(request: Request,
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	finally:
+		con.close()
 
 @app.get("/api/mrts")
 async def 取得捷運站名稱列表(request: Request):
 	try:
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor(dictionary=True)
 		sql = "SELECT mrt FROM tripdata GROUP BY mrt ORDER BY COUNT(mrt) DESC"
 		cursor.execute(sql)
@@ -125,6 +131,8 @@ async def 取得捷運站名稱列表(request: Request):
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	finally:
+		con.close()
 
 
 class SignUp(BaseModel):
@@ -193,7 +201,7 @@ async def 註冊一個新的會員(request: Request,
 		name = signup_dict["name"] # 取值
 		email = signup_dict["email"]
 		password = signup_dict["password"]
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor(dictionary=True)
 		cursor.execute("SELECT email FROM member WHERE email = %s", (email,))
 		data = cursor.fetchone()
@@ -204,13 +212,15 @@ async def 註冊一個新的會員(request: Request,
 		else:
 			hashed_password = hash_password(password)
 			cursor.execute("INSERT INTO member(name, email, password) VALUES(%s, %s, %s)", (name, email, hashed_password))
-			con.commit()
+			con = pool.get_connection()
 			return JSONResponse(
 				{"ok": True})
 	except Exception as e:
 		return JSONResponse(
 			{"error": True, "message": f"{e}"},
 			status_code=500)
+	finally:
+		con.close()
 
 @app.get("/api/user/auth")
 async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer)): # payload 是字典類型，且值由 Depends(jwt_bearer) 提供
@@ -224,12 +234,11 @@ async def 登入會員帳戶(request: Request,
 		signin_dict = data.model_dump() 
 		email = signin_dict["email"]
 		password = signin_dict["password"]
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor()
 		cursor.execute("SELECT * FROM member WHERE email = %s", (email, ))
 		data = cursor.fetchone()
 		hash_password = data[3]
-		print(hash_password)
 		if data and bcrypt.checkpw(password.encode("utf-8"), hash_password.encode("utf-8")):
 			id, name, email, _ = data
 			payload = {
@@ -251,45 +260,50 @@ async def 登入會員帳戶(request: Request,
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	finally:
+		con.close()
 	
 @app.get("/api/booking")
 async def 取得尚未確認下單的預定行程(payload: dict = Depends(jwt_bearer)):
 	if payload != None:
 		member_id =  payload["data"]["id"]
-		con.reconnect()
-		cursor = con.cursor()
-		cursor.execute( # 透過 token 得到使用者 id 後取其預定資料
-			"""SELECT attraction_id, date, time, price FROM cart 
-			WHERE member_id = %s 
-			ORDER BY id DESC 
-			LIMIT 1""", 
-			(member_id,)
-			)
-		data = cursor.fetchone()
-		if data:
-			attraction_id, date, time, price = data
-			cursor.execute( # 根據景點編號取對應景點資料
-				"""SELECT name, address, images 
-				FROM tripdata INNER JOIN images ON tripdata.id = images.trip_id 
-				WHERE tripdata.id = %s
-				LIMIT 1""",
-				(attraction_id,)
+		con = pool.get_connection()
+		try:
+			cursor = con.cursor()
+			cursor.execute( # 透過 token 得到使用者 id 後取其預定資料
+				"""SELECT attraction_id, date, time, price FROM cart 
+				WHERE member_id = %s 
+				ORDER BY id DESC 
+				LIMIT 1""", 
+				(member_id,)
 				)
 			data = cursor.fetchone()
-			name, address, images = data
-			return JSONResponse({
-					"data": {
-						"attraction": {
-							"id": attraction_id,
-							"name": name,
-							"address": address,
-							"image": images
-						},
-						"date": date,
-						"time": time,
-						"price": price
-					}
-					})
+			if data:
+				attraction_id, date, time, price = data
+				cursor.execute( # 根據景點編號取對應景點資料
+					"""SELECT name, address, images 
+					FROM tripdata INNER JOIN images ON tripdata.id = images.trip_id 
+					WHERE tripdata.id = %s
+					LIMIT 1""",
+					(attraction_id,)
+					)
+				data = cursor.fetchone()
+				name, address, images = data
+				return JSONResponse({
+						"data": {
+							"attraction": {
+								"id": attraction_id,
+								"name": name,
+								"address": address,
+								"image": images
+							},
+							"date": date,
+							"time": time,
+							"price": price
+						}
+						})
+		finally:
+			con.close()
 	else:
 		return JSONResponse(
 			{"error": True, "message": "未登入系統，拒絕存取"},
@@ -309,7 +323,7 @@ async def 建立新的預定行程(
 				date = booking_dict["date"]
 				time = booking_dict["time"]
 				price = booking_dict["price"]
-				con.reconnect()
+				con = pool.get_connection()
 				cursor=con.cursor()
 				cursor.execute( # 儲存預定資料至資料庫
 					"INSERT INTO cart(member_id, attraction_id, date, time, price) VALUES(%s, %s, %s, %s, %s)",
@@ -329,15 +343,18 @@ async def 建立新的預定行程(
 		return JSONResponse(
 			{"error": True, "message": f"{e}"},
 			status_code=500)
+	finally:
+		con.close()
 
 @app.delete("/api/booking")
 async def 刪除目前的預定行程(payload: dict = Depends(jwt_bearer)):
 	if payload != None:
 		member_id =  payload["data"]["id"]
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor()
 		cursor.execute("DELETE FROM cart WHERE member_id = %s", (member_id,))
 		con.commit()
+		con.close()
 		return JSONResponse({"ok": True})
 	else:
 		return JSONResponse(
@@ -409,7 +426,7 @@ async def 建立新的訂單並完成付款程序(
 				email = orders_dict["order"]["contact"]["email"]
 				phone = orders_dict["order"]["contact"]["phone"]
 				payment = "UNPAID"
-				con.reconnect()
+				con = pool.get_connection()
 				cursor=con.cursor()
 				cursor.execute(
 					"""INSERT INTO orders(member_id, attraction_id, date, time, price, name, email, phone, payment) 
@@ -492,12 +509,8 @@ async def 建立新的訂單並完成付款程序(
 		return JSONResponse(
 			{"error": True, "message": f"{e}"},
 			status_code=500)
-
-
-
-
-con.close()
-
+	finally:
+		con.close()
 
 
 # Static Pages (Never Modify Code in this Block)
