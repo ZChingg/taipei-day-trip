@@ -6,7 +6,7 @@
     background-position: top; /* 確保圖片置中 */
     height: 320px;
 }
-.frame-slogan{
+.welcome__slogan{
     box-sizing: border-box;
     height: 169px;
     width: 1200px;
@@ -18,19 +18,19 @@
     position: relative;
     top: 25%;
 }
-.slogan-relax{
+.welcome__slogan-title{
    height: 41px;
    color: #F8F8F8;
 }
-.slogan-develop{
+.welcome__slogan-msg{
     height: 22px;
     font-weight: 700;
     color: #F8F8F8;
 }
-.searchbar{
+.welcome__searchbar{
     display: flex;
 }
-.input-search{
+.welcome__input{
     box-sizing: border-box;
     width: 400px;
     height: 46px;
@@ -43,7 +43,7 @@
     border-radius: 5px 0 0 5px;
     box-shadow: 0px 0px 20px 0px #AABBCC;
 }
-.search{
+.welcome__btn{
     display: flex;
     width: 60px;
     height: 46px;
@@ -54,7 +54,7 @@
     border: none;
     cursor: pointer;
 }
-.frame-listbar{
+.listbar{
     box-sizing: border-box;
     display: flex;
     align-items: center; 
@@ -64,50 +64,46 @@
     padding: 0px 0px 20px 0px;
     margin-top: 35px;
 }
-.arrow-left{
-    padding: 9px 0 9px 15px;
+.arrow{
     opacity: 50%;
     margin-right: 10px;
     cursor: pointer;
 }
-.arrow-left:hover{
+.arrow:hover{
     opacity: 100%;
+}
+.arrow-left{
+    padding: 9px 0 9px 15px;
 }
 .arrow-right{
     padding: 9px 15px 9px 0;
-    opacity: 50%;
-    margin-left: 10px;
-    cursor: pointer;
 }
-.arrow-right:hover{
-    opacity: 100%;
-}
-.container{
+.listbar__mrts{
     width: 1106px;
     height: 50px;
     display: flex;
     overflow-x: scroll; /* 超出的部分用 scroll 功能 */
     align-items: center; 
 }
-.container div{
+.listbar__mrts div{
     display: grid;
     grid-auto-flow: column; /* 網格流向(預設row): 橫向排列 */
     grid-auto-columns: minmax(auto, max-content); /* minmax(min, max): 設最小＆大寬 */
     grid-gap: 4px;
 }
-.container::-webkit-scrollbar{
+.listbar__mrts::-webkit-scrollbar{
     display: none; /* 不要看到拉霸 */
 }
-.item-list{
+.listbar__mrts-item{
     padding: 5px 15px 5px 15px;
     text-align: center;
     white-space: nowrap; /* 確保單行顯示不換行 */
 }
-.item-list:hover{
+.listbar__mrts-item:hover{
     color: black;
     cursor: pointer;
 }
-.frame-attraction{
+.attraction{
     box-sizing: border-box;
     display: grid;
     margin: auto;
@@ -117,7 +113,7 @@
     padding: 15px 20px;
     margin-bottom: 40px;
 }
-.box{
+.attraction__box{
     box-sizing: border-box;
     height: 242px;
     width: 270px;
@@ -126,17 +122,17 @@
     box-shadow: 0 0 0 1px #E8E8E8;
     cursor: pointer;
 }
-.attraction{
+.attraction__img{
     background-image: url();
     background-size: cover;
     background-position: center;
     height: 197px;
     border-radius: 5px 5px 0 0;
 }
-.attraction:hover{
+.attraction__img:hover{
     opacity: 0.9;
 }
-.title{
+.attraction__title{
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -155,7 +151,7 @@
     line-height: 16px;
     text-overflow: ellipsis;
 }
-.info{
+.attraction__info{
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -166,13 +162,13 @@
     padding: 10px;
     border-radius: 0 0 5px 5px;
 }
-.mrt{
+.attraction__mrt{
     display: flex;
     align-items: center;
     width: 125px;
     height: 25px;
 }
-.category{
+.attraction__category{
     display: flex;
     align-items: center;
     width: 125px;
@@ -182,59 +178,59 @@
 }
 
 @media (min-width:600px) and (max-width:1199px){
-    .frame-listbar{
+    .listbar{
         width: 100%;
     }
-    .container{
+    .listbar__mrts{
         width: 100%; 
     }
-    .frame-slogan{
+    .welcome__slogan{
         width: 100%;
     }
-    .frame-attraction{
+    .attraction{
         width: 100%;
         grid-template-columns: repeat(2, 1fr);
     }
-    .box{
+    .attraction__box{
         width: 100%;
     }
-    .info div{
+    .attraction__info div{
         width: 100%;
     }
 }
 
 @media(max-width:599px){
-    .frame-listbar{
+    .listbar{
         width: 100%;
     }
-    .container{
+    .listbar__mrts{
         width: 100%;
     }
-    .frame-slogan{
+    .welcome__slogan{
         width: 100%;
     }
-    .input-search{
+    .welcome__input{
         width: calc(100% - 160px); /* 減號要空格 */
     }
-    .frame-attraction{
+    .attraction{
         width: 100%;
         grid-template-columns: 100%;
         grid-gap: 15px;
     }
-    .box{
+    .attraction__box{
         height: 280px;
         width: 100%;
     }
-    .attraction{
+    .attraction__img{
         height: 235px;
     }
-    .title{
+    .attraction__title{
         top: 195px;
     }
-    .info{
+    .attraction__info{
         top: 195px;
     }
-    .info div{
+    .attraction__info div{
         width: 100%;
     }
 }

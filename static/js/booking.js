@@ -15,7 +15,7 @@ async function getOrderData(){
     bookingData.style.display = "block";
     noBookingData.style.display = "none";
     let site = data.data
-    let tourPicture = document.querySelector(".section__picture")
+    let tourPicture = document.querySelector(".attraction__picture")
     let tourLink = document.getElementById("tourLink");
     let tourName = document.getElementById("tourName");
     let tourDate = document.getElementById("tourDate");
@@ -174,7 +174,7 @@ async function onSubmit(event){
       body: JSON.stringify(data)
     });
     const responseData = await response.json();
-    let errorMsgDiv = document.querySelector(".confirm__error-message");
+    let errorMsgDiv = document.querySelector(".user__confirm-error");
     if(responseData.data){
       if(responseData.data.payment.status == 0){
         let orderNumber = responseData.data.number;

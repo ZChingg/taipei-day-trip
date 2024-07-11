@@ -25,20 +25,17 @@ h3{
   margin-block-start: 0;
   margin-block-end: 0;
 }
-body{ /* 設定的值會套用至所有文字 */
+body{
   font-size: 16px;
-  line-height: 14px;
+  line-height: 13.3px;
   font-weight: 400;
   color: #666666;
   font-family: "Noto Sans TC", sans-serif; /* 若無法使用首個字型，則指定無襯線的隨意內建字型(通用字) */
   background-color: white;
-  /* display: flex; 
-  flex-direction: column;
-  min-height: 100vh; */
 }
 a:any-link{
   color: #448899;
-  text-decoration: none; /* 不要有底線 */ 
+  text-decoration: none;
 }
 hr{
   border: 1px solid #E8E8E8;
@@ -48,32 +45,31 @@ hr{
 
 /* 最上方 navigation bar */
 .navigation{
-  display: flex; /* 下一層次的項目水平排列 */ 
-  align-items: center; /* 垂直對齊 */
+  display: flex; 
   position: sticky;
   top: 0;
   height: 54px;
   background-color: white;
   z-index: 1;
 }
-.frame{
+.navigation__frame{
   display: flex;
   align-items: center; 
-  margin: auto; /* 常用於置中元素，將剩下的空間平均分配給四周 */
+  margin: auto;
   width: 1200px;
   height: 34px;
 }
-.frame-flexend{
+.navigation__frame--end{
   display: flex;
   justify-content: flex-end;
   flex: auto;
 }
-.item-navigation{
+.navigation__item{
   flex: none;
   padding: 10px;
   font-weight: 500;
 }
-.item-navigation:hover{
+.navigation__item:hover{
   color: black;
   cursor: pointer;
 }
@@ -83,7 +79,6 @@ footer{
   display: flex;
   justify-content: center;
   height: 104px; 
-  /* min-height: 100vh; */
   background-color: #666666;
 }
 footer p{

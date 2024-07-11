@@ -8,21 +8,21 @@
 </head>
 <body>
   <div class="navigation">
-    <div class="frame">
+    <div class="navigation__frame">
       <h2><a href="/">台北一日遊</a></h2>
-      <div class="frame-flexend">
-        <div class="item-navigation" id="bookingPage">預定行程</div>
-        <div class="item-navigation" id="signin" onclick="getSign()" style="display:none">登入/註冊</div>
-        <div class="item-navigation" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
+      <div class="navigation__frame--end">
+        <div class="navigation__item" id="bookingPage">預定行程</div>
+        <div class="navigation__item" id="signin" onclick="getSign()" style="display:none">登入/註冊</div>
+        <div class="navigation__item" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
       </div>
     </div>
   </div>
   <hr>
-  <div class="frame__order_msg">
-    <div class="order-msg-headline">行程預定成功</div>
-    <div class="order-msg-headline">您的訂單編號如下</div>
-    <div class="order-msg-content" id="orderNumber"></div>
-    <div class="order-msg-content">請記住此編號，或到會員中心查詢歷史訂單</div>
+  <div class="order">
+    <div class="order__headline">行程預定成功</div>
+    <div class="order__headline">您的訂單編號如下</div>
+    <div class="order__content" id="orderNumber"></div>
+    <div class="order__content">請記住此編號，或到會員中心查詢歷史訂單</div>
   </div>
   <footer><p>COPYRIGHT © 2021 台北一日遊</p></footer>
   <script src="/static/js/sign.js"></script>

@@ -1,6 +1,6 @@
 // Listbar
 // 設置左右滾動功能
-let scrollContainer = document.querySelector(".container");
+let scrollContainer = document.querySelector(".listbar__mrts");
 let arrowRight = document.querySelector(".arrow-right");
 let arrowLeft = document.querySelector(".arrow-left");
 arrowRight.addEventListener("click", ()=>{
@@ -14,7 +14,7 @@ arrowLeft.addEventListener("click", ()=>{
 // 因應網頁寬度設置每次滾動距離
 function getDistance(){
   let width = window.innerWidth;
-  let containerDistance = document.querySelector(".container").offsetWidth; // 元素本身寬度(含border/捲軸/padding)
+  let containerDistance = document.querySelector(".listbar__mrts").offsetWidth; // 元素本身寬度(含border/捲軸/padding)
   if(width >= 600 && width <= 1199){
     return containerDistance*0.9;
   }else if(width <= 599){
@@ -28,13 +28,13 @@ fetch("/api/mrts")
 .then(function(response){
   return response.json();
 }).then(function(mrt){
-  let containerDiv = document.querySelector(".container div");
+  let containerDiv = document.querySelector(".listbar__mrts div");
   // 抓資料，同步創建新 div
   for(let i=0; i<mrt.data.length; i++){
     let mrts = mrt.data[i];
     // 建新 div
     let itemList = document.createElement("div");
-    itemList.className = "item-list";
+    itemList.className = "listbar__mrts-item";
     itemList.textContent = mrts;
     itemList.onclick = getMRT.bind(null, mrts); // bind 使用！
     // 將 "子 div" 加到對應的 "父 div" 底下
@@ -43,7 +43,7 @@ fetch("/api/mrts")
 });
 // 點擊 mrt 搜尋
 function getMRT(mrts){
-  let input = document.querySelector(".input-search");
+  let input = document.querySelector(".welcome__input");
   input.value = mrts;
   getKeyword();
 }
@@ -57,7 +57,7 @@ fetch("/api/attractions")
   return response.json();
 }).then(function(data){
   nextPage = data.nextPage;
-  let frameAttraction = document.querySelector(".frame-attraction");
+  let frameAttraction = document.querySelector(".attraction");
   // 抓 data 中資料，同步創建新 div
   for (let i=0; i<data.data.length; i++){
     let site = data.data[i];
@@ -74,7 +74,7 @@ fetch("/api/attractions")
 });
 // 隨著網頁下滑載入的更多資料
 function getAttraction(){
-  let keyword = document.querySelector(".input-search").value; // 獲取值
+  let keyword = document.querySelector(".welcome__input").value; // 獲取值
   let url = `/api/attractions?page=${nextPage}`;
   if(keyword){
     url += `&keyword=${keyword}`;
@@ -85,7 +85,7 @@ function getAttraction(){
       return response.json();
     }).then(function(data){
       nextPage = data.nextPage; // 更新 nextPage 數字
-      let frameAttraction = document.querySelector(".frame-attraction");
+      let frameAttraction = document.querySelector(".attraction");
       // 抓 data 中資料，同步創建新 div
       for(let i=0; i<data.data.length; i++){
         let site = data.data[i];
@@ -97,13 +97,13 @@ function getAttraction(){
 // 搜尋欄輸入關鍵字載入對應資料
 function getKeyword(){
   nextPage = 0; // 重點: nextPage 重新賦值為 0 
-  let keyword = document.querySelector(".input-search").value; // 獲取值
+  let keyword = document.querySelector(".welcome__input").value; // 獲取值
   fetch(`/api/attractions?page=${nextPage}&keyword=${keyword}`)
   .then(function(response){
     return response.json();
     }).then(function(data){
       nextPage = data.nextPage; // 更新 nextPage 數字
-      let frameAttraction = document.querySelector(".frame-attraction");
+      let frameAttraction = document.querySelector(".attraction");
       frameAttraction.innerHTML = ""; // 清空現有的 box 元素
       // 抓 data 中資料，同步創建新 div
       for(let i=0; i<data.data.length; i++){
@@ -123,27 +123,27 @@ function createBox(site, frameAttraction){ // 接收 site 數據 & frameAttracti
 
   // 建新 div
   let box = document.createElement("div");
-  box.className = "box";
+  box.className = "attraction__box";
   let link = document.createElement("a");
   link.href = `/attraction/${id}`;
 
   let attraction = document.createElement("div");
-  attraction.className = "attraction";
+  attraction.className = "attraction__img";
   attraction.style.backgroundImage = `url(${images})`;
 
   let title = document.createElement("div");
-  title.className = "title";
+  title.className = "attraction__title";
   let ellipsis = document.createElement("p");
   ellipsis.className = "ellipsis";
   ellipsis.textContent = name;
 
   let info = document.createElement("div");
-  info.className = "info";
+  info.className = "attraction__info";
   let mrtDiv = document.createElement("div");
-  mrtDiv.className = "mrt";
+  mrtDiv.className = "attraction__mrt";
   mrtDiv.textContent = mrt;
   let categoryDiv = document.createElement("div");
-  categoryDiv.className = "category";
+  categoryDiv.className = "attraction__category";
   categoryDiv.textContent = category;
 
   // 將 "子 div" 加到對應的 "父 div" 底下

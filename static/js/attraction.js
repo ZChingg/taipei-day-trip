@@ -34,7 +34,7 @@ fetch(`/api/attraction/${attractionId}`)
     transportDiv.textContent = site["transport"];
     // 建 silde div
     let slider = document.querySelector(".slider div");
-    let dotsbox = document.querySelector(".dotsbox");
+    let dotsbox = document.querySelector(".slider__dotsbox");
     for(let i=0; i<site.images.length; i++){
       // 照片部分
       let images = site.images[i]
@@ -42,19 +42,19 @@ fetch(`/api/attraction/${attractionId}`)
       if(i===0){
         myslide.style = "display: block;";
       }
-      myslide.className = "myslide fade";
+      myslide.className = "slider__myslide fade";
       myslide.style.backgroundImage = `url(${images})`;
       slider.appendChild(myslide);
       // 下方圓點部分
       let dot = document.createElement("span");
-      dot.className = "dot";
+      dot.className = "slider__dot";
       dot.onclick = currentSlide.bind(null, i+1); 
       dotsbox.appendChild(dot);
     }
 
     // slideshow 幻燈片功能
-    const myslide = document.querySelectorAll(".myslide");  // Nodelist
-    const dot = document.querySelectorAll(".dot");
+    const myslide = document.querySelectorAll(".slider__myslide");  // Nodelist
+    const dot = document.querySelectorAll(".slider__dot");
     // 初始化計數+顯示首圖
     let counter = 1; 
     slidefun(counter);
@@ -104,10 +104,10 @@ fetch(`/api/attraction/${attractionId}`)
     }
 
     // 改用 addEventListener 避免 html 直接用 onclick = plsuSlides()，但函式在頁面加載時還尚未被定義問題
-    document.querySelector('.prev').addEventListener("click", ()=>{
+    document.querySelector('.slider__prev').addEventListener("click", ()=>{
       plusSlides(-1);
     });
-    document.querySelector('.next').addEventListener("click", ()=>{
+    document.querySelector('.slider__next').addEventListener("click", ()=>{
       plusSlides(1);
     });
   }else{

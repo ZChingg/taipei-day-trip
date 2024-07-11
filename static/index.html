@@ -8,62 +8,62 @@
 </head>
 <body>
   <div class="navigation">
-    <div class="frame">
+    <div class="navigation__frame">
       <h2><a href="/">台北一日遊</a></h2>
-      <div class="frame-flexend">
-        <div class="item-navigation" id="bookingPage">預定行程</div>
-        <div class="item-navigation" id="signin" onclick="getSign()" style="display:none">登入/註冊</div>
-        <div class="item-navigation" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
+      <div class="navigation__frame--end">
+        <div class="navigation__item" id="bookingPage">預定行程</div>
+        <div class="navigation__item" id="signin" onclick="getSign()" style="display:none">登入/註冊</div>
+        <div class="navigation__item" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
       </div>
     </div>
   </div>
   <div class="welcome">
-    <div class="frame-slogan">
-      <h1 class="slogan-relax">輕鬆享受台北一日悠閒</h1>
-      <div class="slogan-develop">探索每個角落，體驗城市的深度旅遊行程</div>
-      <div class="searchbar">
-        <input class="input-search" type="text" placeholder="輸入景點名稱查詢" />
-        <button class="search" type="submit" onclick="getKeyword()"><img src="static/pic/search.png"></img>
+    <div class="welcome__slogan">
+      <h1 class="welcome__slogan-title">輕鬆享受台北一日悠閒</h1>
+      <div class="welcome__slogan-msg">探索每個角落，體驗城市的深度旅遊行程</div>
+      <div class="welcome__searchbar">
+        <input class="welcome__input" type="text" placeholder="輸入景點名稱查詢" />
+        <button class="welcome__btn" type="submit" onclick="getKeyword()"><img src="static/pic/search.png"></img>
       </div>
     </div>
   </div>
   </div>
-  <div class="frame-listbar">
-    <img src="static/pic/index-arrow-left.png" class="arrow-left">
-    <div class="container">
+  <div class="listbar">
+    <img src="static/pic/index-arrow-left.png" class="arrow arrow-left">
+    <div class="listbar__mrts">
       <div></div> <!-- appendchild 加對應 mrt -->
     </div>
-    <img src="static/pic/index-arrow-right.png" class="arrow-right">
+    <img src="static/pic/index-arrow-right.png" class="arrow arrow-right">
   </div>
-  <div class="frame-attraction"></div> <!-- appendchild 加對應 attraction -->
+  <div class="attraction"></div> <!-- appendchild 加對應 attraction -->
   <footer id="footer"><p>COPYRIGHT © 2021 台北一日遊</p></footer>
   <!-- popup menu -->
-  <div class="wrapper-popup"> <!-- 黑色部分 -->
+  <div class="popup__wrapper"> <!-- 黑色部分 -->
      <!-- 登入帳號 Signin -->
     <div class="popup move" id="popup-signin">
-      <div class="popup-decoratorbar"></div>
-      <div class="popup-content">
-        <h3 class="popup-title">登入會員帳號</h3>
-        <div class="popup-close" onclick="getClose()"><img src="static/pic/close.png"></img></div>
-          <input type="email" id="signin-email" class="popup-input" placeholder="輸入電子郵件"/>
-          <input type="password" id="signin-password" class="popup-input input-password" placeholder="輸入密碼"/>
-          <button class="popup-btn" onclick="getSignIn()">登入帳戶</button>
-        <div class="popup-alert" id="signin-alert"></div>
-        <div class="popup-message">還沒有帳戶了？<span class="popup-change" onclick="ChangeToSignUp()">點此註冊</span></div>
+      <div class="popup__decoratorbar"></div>
+      <div class="popup__content">
+        <h3 class="popup__title">登入會員帳號</h3>
+        <div class="popup__close" onclick="getClose()"><img src="static/pic/close.png"></img></div>
+          <input type="email" id="signin-email" class="popup__input" placeholder="輸入電子郵件"/>
+          <input type="password" id="signin-password" class="popup__input popup__password" placeholder="輸入密碼"/>
+          <button class="popup__btn" onclick="getSignIn()">登入帳戶</button>
+        <div class="popup__alert" id="signin-alert"></div>
+        <div class="popup__message">還沒有帳戶了？<span class="popup__change" onclick="ChangeToSignUp()">點此註冊</span></div>
       </div>
     </div> 
     <!-- 註冊帳號 Signup -->
     <div class="popup move" id="popup-signup" style="display: none;">
-      <div class="popup-decoratorbar"></div>
-      <div class="popup-content">
-        <h3 class="popup-title">註冊會員帳號</h3>
-        <div class="popup-close" onclick="getClose()"><img src="static/pic/close.png"></img></div>
-        <input type="text" id="signup-name" class="popup-input" placeholder="輸入姓名"/>
-        <input type="email" id="signup-email" class="popup-input" placeholder="輸入電子郵件"/>
-        <input type="password" id="signup-password" class="popup-input input-password" placeholder="輸入密碼"/>
-        <button class="popup-btn" onclick="getSignUp()">註冊新帳號</button>
-        <div class="popup-alert" id="signup-alert"></div>
-        <div class="popup-message">已經有帳戶了？<span class="popup-change" onclick="ChangeToSignIn()">點此登入</span></div>
+      <div class="popup__decoratorbar"></div>
+      <div class="popup__content">
+        <h3 class="popup__title">註冊會員帳號</h3>
+        <div class="popup__close" onclick="getClose()"><img src="static/pic/close.png"></img></div>
+        <input type="text" id="signup-name" class="popup__input" placeholder="輸入姓名"/>
+        <input type="email" id="signup-email" class="popup__input" placeholder="輸入電子郵件"/>
+        <input type="password" id="signup-password" class="popup__input popup__password" placeholder="輸入密碼"/>
+        <button class="popup__btn" onclick="getSignUp()">註冊新帳號</button>
+        <div class="popup__alert" id="signup-alert"></div>
+        <div class="popup__message">已經有帳戶了？<span class="popup__change" onclick="ChangeToSignIn()">點此登入</span></div>
       </div>
     </div>
   </div>
