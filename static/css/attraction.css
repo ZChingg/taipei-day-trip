@@ -15,6 +15,46 @@
   height: 400px;
   width: 540px;
 }
+.slider__loading{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+.slider__loading-msg{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.slider__loading-spin{
+  border: 3px solid white;
+  border-top: 3px solid #666666;;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  animation: spin 1.5s linear infinite;
+}
+.slider__loading-pic{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+}
+@keyframes spin{
+  from {transform: rotate(0deg)}
+  to {transform: rotate(360deg)}
+}
 .slider__box{
   height: 100%;
   width: 100%;
@@ -34,6 +74,7 @@
   padding: 10px;
   cursor: pointer;
   opacity: 75%;
+  display: none;
 }
 .slider__prev:hover, .slider__next:hover{
   opacity: 90%;
@@ -115,7 +156,7 @@
   cursor: pointer;
 }
 .profile__btn:hover{
-  background-color: #3E7E8E;
+  background-color: #376F7D;
 }
 .profile__date{
   box-sizing: border-box;
@@ -127,10 +168,12 @@
   line-height: 14px;
   font-weight: 400;
   font-family: Noto Sans TC;
+  cursor: pointer;
 }
 input[type="date"]::-webkit-calendar-picker-indicator{
   width: 22px;
   height: 22px;
+  cursor: pointer;
 }
 input[type="radio"]{
   width: 22px;
@@ -140,6 +183,7 @@ input[type="radio"]{
   background: white;
   border-radius: 50%;
   margin: 0 5px 0 15px;
+  cursor: pointer;
 }
 input[type="radio"]:checked:before{
   content: "";
@@ -181,6 +225,22 @@ input[type="radio"]:checked:before{
   line-height: 23.17px;
   text-align: left;
   width: 100%;
+}
+
+.skeleton{
+  background-color: #ddd;
+  border-radius: 4px;
+  min-height: 15px;
+  margin-bottom: 10px;
+}
+.skeleton-text {
+  background: linear-gradient(90deg, #ddd 25%, #eee 50%, #ddd 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+@keyframes loading {
+  from{background-position: 200% 0}
+  to{background-position: -200% 0}
 }
 
 @media(min-width:690px) and (max-width:1199px){

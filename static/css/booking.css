@@ -13,22 +13,21 @@ input{
   line-height: 14px;
   font-weight: 500;
 }
-.booking{
-  width: 1200px;
-  margin: 30px auto 40px auto;
-}
 .headline{
   box-sizing: border-box;
   width: 1000px;
   padding: 0 10px;
   height: 27px;
-  margin: auto;
   font-size: 19px;
   line-height: 16px;
   font-weight: 700;
   display: flex;
   align-items: center;
-  margin-top: 40px;
+  margin: 40px auto 30px auto;
+}
+.booking{
+  width: 1200px;
+  margin: 0 auto 40px auto;
 }
 .booking__attraction{
   display: flex;
@@ -70,6 +69,9 @@ input{
   top: 0;
   cursor: pointer;
 }
+.attraction__delete:hover{
+  filter: brightness(0);
+}
 .booking__user{
   box-sizing: border-box;
   width: 1000px;
@@ -105,13 +107,9 @@ input{
   box-sizing: border-box;
   padding: 5px 0;
 }
-.user__confirm-error{
-  color: darkred;
-  font-weight: 700;
-}
 .user__confirm-btn{
   box-sizing: border-box;
-  margin: 22px 0;
+  margin: 22px 0 0 0;
   border-radius: 5px;
   background-color: #448899;
   width: 173px;
@@ -126,7 +124,13 @@ input{
   cursor: pointer;
 }
 .user__confirm-btn:hover{
-  background-color: #3E7E8E;
+  background-color: #376F7D;
+}
+.user__confirm-error{
+  box-sizing: border-box;
+  font-weight: 700;
+  color: darkred;
+  padding: 18px 0 0 0;
 }
 .booking__none-msg{
   box-sizing: border-box;
@@ -152,6 +156,37 @@ input{
   background-color: white;
   border: 1px solid #E8E8E8;
   border-radius: 5px;
+}
+.transfer{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.7);
+  justify-content: center;
+  display: none;
+}
+.transfer__msg{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.transfer__loader{
+  position: relative;
+  top: 38%;
+  border: 3px solid #666666;
+  border-top: 3px solid white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin{
+  from {transform: rotate(0deg)}
+  to {transform: rotate(360deg)}
 }
 
 @media(min-width:690px) and (max-width:1199px){

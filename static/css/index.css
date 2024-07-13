@@ -54,6 +54,9 @@
     border: none;
     cursor: pointer;
 }
+.welcome__btn:hover{
+    background: #376F7D;
+}
 .listbar{
     box-sizing: border-box;
     display: flex;
@@ -129,6 +132,9 @@
     height: 197px;
     border-radius: 5px 5px 0 0;
 }
+.attraction__box:hover{
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+}
 .attraction__img:hover{
     opacity: 0.9;
 }
@@ -161,6 +167,7 @@
     background-color: white;
     padding: 10px;
     border-radius: 0 0 5px 5px;
+    color: #666666;;
 }
 .attraction__mrt{
     display: flex;

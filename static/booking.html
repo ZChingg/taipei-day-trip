@@ -77,11 +77,11 @@
       </div>
     </div>
     <hr>
-    <div class="booking__user">
+    <div class="booking__user" style="margin-bottom: 62px;">
       <div class="user__confirm">
-        <p class="user__confirm-error"></p>
         <p><strong>總價：<span id="tourPayment"></span></strong></p>
         <button type="submit" class="user__confirm-btn">確認訂購並付款</button>
+        <div class="user__confirm-error" id="bookingError"></div>
       </div>
     </div>
   </form>
@@ -89,6 +89,11 @@
     <div class="booking__none-msg">目前沒有任何待預訂的行程</div>
   </div>
   <footer><p>COPYRIGHT © 2021 台北一日遊</p></footer>
+  <!-- 交易進行 loader -->
+  <div class="transfer">
+    <div class="transfer__msg">交易進行中，請稍候 …</div>
+    <div class="transfer__loader"></div>
+  </div>
   <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.14.0"></script> <!-- TapPay -->
   <script src="/static/js/sign.js"></script>
   <script src="/static/js/booking.js"></script>

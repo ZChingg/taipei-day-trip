@@ -21,6 +21,11 @@
   <div class="section">
     <div class="slider">
       <div class="slider__box"></div> <!-- appendchild myslide -->
+      <div class="slider__loading">
+        <div class="slider__loading-msg">loading...</div>
+        <div class="slider__loading-spin"></div>
+        <div class="slider__loading-pic"></div>
+      </div>
       <a class="slider__prev">
         <img src="/static/pic/attraction-arrow-left.png">
       </a>
@@ -56,13 +61,25 @@
     </div>
   </div>
   <hr class="hr-middle">
-  <div class="infos">
+  <div id="infos" class="infos" style="display: none;">
     <div class="infos__content" id="description"></div>
     <div class="infos__title">景點地址：</div>
     <div class="infos__content" id="address"></div>
     <div class="infos__title">交通方式：</div>
     <div class="infos__content" id="transport"></div>
   </div>
+  <!-- Skeleton Loading Screen -->
+  <div id="skeleton-screen" class="infos">
+    <div class="skeleton skeleton-text" style="width:100%"></div>
+    <div class="skeleton skeleton-text" style="width:95%"></div>
+    <div class="skeleton skeleton-text" style="width:100%"></div>
+    <div class="skeleton skeleton-text" style="width:90%; margin-bottom: 30px;"></div>
+    <div class="skeleton skeleton-text" style="width:10%"></div>
+    <div class="skeleton skeleton-text" style="width:80%; margin-bottom: 30px;"></div>
+    <div class="skeleton skeleton-text" style="width:10%"></div>
+    <div class="skeleton skeleton-text" style="width:90%"></div>
+  </div>
+  <!-- footer -->
   <footer><p>COPYRIGHT © 2021 台北一日遊</p></footer>
   <!-- popup menu -->
   <div class="popup__wrapper"> <!-- 黑色部分 -->
