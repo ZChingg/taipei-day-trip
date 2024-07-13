@@ -197,7 +197,7 @@ def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): #
 async def 註冊一個新的會員(request: Request,
 				   data: SignUp = None):
 	try:
-		signup_dict = data.model_dump() # 將資料轉換為字典格式
+		signup_dict = data.dict() # 將資料轉換為字典格式
 		name = signup_dict["name"] # 取值
 		email = signup_dict["email"]
 		password = signup_dict["password"]
@@ -212,7 +212,7 @@ async def 註冊一個新的會員(request: Request,
 		else:
 			hashed_password = hash_password(password)
 			cursor.execute("INSERT INTO member(name, email, password) VALUES(%s, %s, %s)", (name, email, hashed_password))
-			con = pool.get_connection()
+			con.commit()
 			return JSONResponse(
 				{"ok": True})
 	except Exception as e:
@@ -231,7 +231,7 @@ async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer))
 async def 登入會員帳戶(request: Request,
 				 data: SignIn = None): 
 	try:
-		signin_dict = data.model_dump() 
+		signin_dict = data.dict() 
 		email = signin_dict["email"]
 		password = signin_dict["password"]
 		con = pool.get_connection()
@@ -239,6 +239,7 @@ async def 登入會員帳戶(request: Request,
 		cursor.execute("SELECT * FROM member WHERE email = %s", (email, ))
 		data = cursor.fetchone()
 		hash_password = data[3]
+		print(hash_password)
 		if data and bcrypt.checkpw(password.encode("utf-8"), hash_password.encode("utf-8")):
 			id, name, email, _ = data
 			payload = {
@@ -318,7 +319,7 @@ async def 建立新的預定行程(
 		if payload != None:
 			member_id = payload["data"]["id"]
 			try:
-				booking_dict = data.model_dump()
+				booking_dict = data.dict()
 				attraction_id = booking_dict["attractionId"]
 				date = booking_dict["date"]
 				time = booking_dict["time"]
@@ -417,7 +418,7 @@ async def 建立新的訂單並完成付款程序(
 			member_id = payload["data"]["id"]
 			try:
 				# 儲存訂單資料至資料庫
-				orders_dict = data.model_dump()
+				orders_dict = data.dict()
 				attraction_id = orders_dict["order"]["trip"]["attraction"]["id"]
 				date = orders_dict["order"]["trip"]["date"]
 				time = orders_dict["order"]["trip"]["time"]
