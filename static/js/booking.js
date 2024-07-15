@@ -15,7 +15,7 @@ async function getOrderData(){
     bookingData.style.display = "block";
     noBookingData.style.display = "none";
     let site = data.data
-    let tourPicture = document.querySelector(".section__picture")
+    let tourPicture = document.querySelector(".attraction__picture")
     let tourLink = document.getElementById("tourLink");
     let tourName = document.getElementById("tourName");
     let tourDate = document.getElementById("tourDate");
@@ -123,17 +123,24 @@ TPDirect.card.onUpdate(function(update){
 
 
 // TPDirect.card.getPrime(callback): 提交表單時利用此取得 prime 字串
-document.querySelector('form').addEventListener('submit', onSubmit);
+document.querySelector("form").addEventListener("submit", onSubmit);
 async function onSubmit(event){
   event.preventDefault();
-  // 取得欄位狀態
+  let alert = document.getElementById("bookingError");
+  alert.style.display = "none";
+  // 取得 Tappay 欄位狀態
   const tappayStatus = TPDirect.card.getTappayFieldsStatus();
   // 確認是否可 getPrime，錯誤則 return
   if(tappayStatus.canGetPrime === false){
+    alert.style.display = "block";
+    alert.textContent = "請輸入有效的信用卡號";
     return;
   }
-
-  let orderData = await getOrderData(); // 取得 site 資訊 for order
+  // 交易進行中 loader
+  let transferLoader = document.querySelector(".transfer")
+  transferLoader.style.display = "flex";
+  // 取得 site 資訊 for order
+  let orderData = await getOrderData();
   
   // Get prime
   TPDirect.card.getPrime(async function(result){ // result 參數含調用 getPrime 後結果
@@ -174,17 +181,26 @@ async function onSubmit(event){
       body: JSON.stringify(data)
     });
     const responseData = await response.json();
-    let errorMsgDiv = document.querySelector(".confirm__error-message");
     if(responseData.data){
       if(responseData.data.payment.status == 0){
         let orderNumber = responseData.data.number;
         getDelete(false); // 刪除 booking 預定資料
-        document.location.href = `/thankyou?number=${orderNumber}`;
+        document.querySelector(".transfer__msg").textContent = "交易成功，系統將自動跳轉 …";
+        setTimeout(()=>{
+          transferLoader.style.display = "none";
+          document.location.href = `/thankyou?number=${orderNumber}`;
+        }, 2000);
       }else{
-        errorMsgDiv.textContent = responseData.data.payment.message;
+        document.querySelector(".transfer__msg").textContent = "交易失敗，請稍候再試 …";
+        setTimeout(()=>{
+          location.reload();
+        }, 2000);
       }
     }else{
-      errorMsgDiv.textContent = responseData.message;
+      document.querySelector(".transfer__msg").textContent = "交易失敗，請稍候再試 …";
+      setTimeout(()=>{
+        location.reload();
+      }, 2000);
     }
   })
 }

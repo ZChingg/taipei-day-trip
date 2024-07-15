@@ -12,6 +12,17 @@ function changeToAfternoon(){
   afternoonDiv.style.display = "block";
 }
 
+// 僅能選取今日以後時間
+document.addEventListener("DOMContentLoaded", ()=>{
+  let dateInput = document.getElementById("date");
+  let today = new Date();
+  let yyyy = today.getFullYear();
+  let mm = String(today.getMonth() + 1).padStart(2, "0");
+  let dd = String(today.getDate()).padStart(2, "0");
+  let todayDate = yyyy + "-" + mm + "-" + dd;
+  dateInput.setAttribute("min", todayDate); 
+});
+
 // 獲取 attractionId 數字抓取對應景點資訊
 let path = window.location.pathname; // 獲取path: /attraction/10
 let attractionId = path.split("/").pop(); // pop(): 移除陣列最後一個值(縮短陣列長度)，並將 "值回傳"
@@ -32,84 +43,109 @@ fetch(`/api/attraction/${attractionId}`)
     addressDiv.textContent = site["address"];
     descriptionDiv.textContent = site["description"];
     transportDiv.textContent = site["transport"];
-    // 建 silde div
-    let slider = document.querySelector(".slider div");
-    let dotsbox = document.querySelector(".dotsbox");
+
+    // Skeleton Loading Screen
+    document.getElementById("skeleton-screen").style.display = "none";
+    document.getElementById("infos").style.display = "block";
+
+    // 預載入 Attraction 圖片並於載入前顯示 loading 動畫
+    let imagesLoaded = 0;
+    document.querySelector(".slider__loading-pic").style.backgroundImage = `url(${site["images"][0]})`;
+
     for(let i=0; i<site.images.length; i++){
-      // 照片部分
-      let images = site.images[i]
-      let myslide = document.createElement("div");
-      if(i===0){
-        myslide.style = "display: block;";
-      }
-      myslide.className = "myslide fade";
-      myslide.style.backgroundImage = `url(${images})`;
-      slider.appendChild(myslide);
-      // 下方圓點部分
-      let dot = document.createElement("span");
-      dot.className = "dot";
-      dot.onclick = currentSlide.bind(null, i+1); 
-      dotsbox.appendChild(dot);
+      const img = new Image();
+      img.src = site.images[i];
+      img.onload = function(){
+        imagesLoaded++;
+        // 圖片皆預載完成則建立幻燈片
+        if(imagesLoaded === site.images.length){
+          document.querySelector(".slider__loading").style.display = "none";
+          document.querySelector(".slider__prev").style.display = "block";
+          document.querySelector(".slider__next").style.display = "block";
+          initializeSlider();
+        }
+      };
     }
+    // 建立幻燈片
+    function initializeSlider(){
+      // 建 silde div
+      let slider = document.querySelector(".slider div");
+      let dotsbox = document.querySelector(".slider__dotsbox");
+      for(let i=0; i<site.images.length; i++){
+        // 照片部分
+        let myslide = document.createElement("div");
+        if(i===0){
+          myslide.style = "display: block;";
+        }
+        myslide.className = "slider__myslide fade";
+        myslide.style.backgroundImage = `url(${site.images[i]})`;
+        slider.appendChild(myslide);
+        // 下方圓點部分
+        let dot = document.createElement("span");
+        dot.className = "slider__dot";
+        dot.onclick = currentSlide.bind(null, i+1); 
+        dotsbox.appendChild(dot);
+      }
 
-    // slideshow 幻燈片功能
-    const myslide = document.querySelectorAll(".myslide");  // Nodelist
-    const dot = document.querySelectorAll(".dot");
-    // 初始化計數+顯示首圖
-    let counter = 1; 
-    slidefun(counter);
-    // 切換圖片
-    // 1.自動播放: setInterval(func, delay)延遲某時間後執行對應程式且"不斷循環"
-    let timer = setInterval(autoSlide, 5000);
-    function autoSlide(){
-      counter += 1;
+      // slideshow 幻燈片功能
+      const myslide = document.querySelectorAll(".slider__myslide");  // Nodelist
+      const dot = document.querySelectorAll(".slider__dot");
+      // 初始化計數+顯示首圖
+      let counter = 1; 
       slidefun(counter);
-    }
-    // 2.點按箭頭
-    function plusSlides(n){
-      counter += n;
-      slidefun(counter);
-      resetTimer();
-    }
-    // 3.點按下方圓點
-    function currentSlide(n){
-      counter = n;
-      slidefun(counter);
-      resetTimer();
-    }
-    // 若點箭頭or下方圓點，重新啟動自動播放
-    function resetTimer(){
-      clearInterval(timer);
-      timer = setInterval(autoSlide, 5000);
-    }
+      // 切換圖片
+      // 1.自動播放: setInterval(func, delay)延遲某時間後執行對應程式且"不斷循環"
+      let timer = setInterval(autoSlide, 5000);
+      function autoSlide(){
+        counter += 1;
+        slidefun(counter);
+      }
+      // 2.點按箭頭
+      function plusSlides(n){
+        counter += n;
+        slidefun(counter);
+        resetTimer();
+      }
+      // 3.點按下方圓點
+      function currentSlide(n){
+        counter = n;
+        slidefun(counter);
+        resetTimer();
+      }
+      // 若點箭頭or下方圓點，重新啟動自動播放
+      function resetTimer(){
+        clearInterval(timer);
+        timer = setInterval(autoSlide, 5000);
+      }
 
-    function slidefun(counter){
-      // 先把所有圖片都隱藏+圓點回歸一般樣式
-      for(let i=0; i<myslide.length; i++){
-        myslide[i].style.display = "none";
+      function slidefun(n){
+        // 先把所有圖片都隱藏+圓點回歸一般樣式
+        for(let i=0; i<myslide.length; i++){
+          myslide[i].style.display = "none";
+        }
+        for(let i=0; i<dot.length; i++){
+          dot[i].className = dot[i].className.replace(" active", "");
+        }
+        // 循環: 計數超出照片總數就回到第一張
+        if(n > myslide.length){
+          counter = 1;
+        }
+        // 循環: 計數0/負數就回到最後一張
+        if(n < 1){
+          counter = myslide.length;
+        }
+        myslide[counter-1].style.display = "block";
+        dot[counter-1].classList.add("active");
       }
-      for(let i=0; i<dot.length; i++){
-        dot[i].className = dot[i].className.replace(" active", "");
-      }
-      // 循環: 計數超出照片總數就回到第一張
-      if(counter > myslide.length){
-        counter = 1;
-      }
-      // 循環: 計數0/負數就回到最後一張
-      if(counter < 1){
-        counter = myslide.length;
-      }
-      myslide[counter-1].style.display = "block";
-      dot[counter-1].classList.add("active");
-    }
 
-    // 改用 addEventListener 避免 html 直接用 onclick = plsuSlides()，但函式在頁面加載時還尚未被定義問題
-    document.querySelector('.prev').addEventListener("click", ()=>{
-      plusSlides(-1);
-    });
-    document.querySelector('.next').addEventListener("click", ()=>{
-      plusSlides(1);
-    });
+      // 改用 addEventListener 避免 html 直接用 onclick = plsuSlides()，但函式在頁面加載時還尚未被定義問題
+      document.querySelector('.slider__prev').addEventListener("click", ()=>{
+        plusSlides(-1);
+      });
+      document.querySelector('.slider__next').addEventListener("click", ()=>{
+        plusSlides(1);
+      });
+    }
   }else{
     document.location.href="/" // 若數字沒資料就導回首頁
   }

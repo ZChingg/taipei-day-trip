@@ -58,13 +58,13 @@ function signinError(){
 
 // popup 設置
 function getSign(){
-  let wrapperPopup = document.querySelector(".wrapper-popup");
+  let wrapperPopup = document.querySelector(".popup__wrapper");
   wrapperPopup.style.display = "block";
 }
 function getClose(){ 
-  let wrapperPopup = document.querySelector(".wrapper-popup");
-  let popupInputs = document.querySelectorAll(".popup-input");
-  let popupAlerts = document.querySelectorAll(".popup-alert");
+  let wrapperPopup = document.querySelector(".popup__wrapper");
+  let popupInputs = document.querySelectorAll(".popup__input");
+  let popupAlerts = document.querySelectorAll(".popup__alert");
   wrapperPopup.style.display = "none";
   for(let i=0; i<popupInputs.length; i++){
     popupInputs[i].value = ""; // 若關閉 popup，就清空原輸入內容/提示語

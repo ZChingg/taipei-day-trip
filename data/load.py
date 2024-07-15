@@ -1,11 +1,19 @@
 import json
 import mysql.connector
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+mysql_user = os.getenv("MYSQL_USER")
+mysql_password = os.getenv("MYSQL_PASSWORD")
+mysql_host = os.getenv("MYSQL_HOST")
+mysql_db = os.getenv("MYSQL_DB")
 
 con = mysql.connector.connect(
-    user = "root",
-    password = "0000",
-    host = "localhost",
-    database = "trip"
+    user = mysql_user,
+    password = mysql_password,
+    host = mysql_host,
+    database = mysql_db
 )
 print("資料庫連線成功")
 

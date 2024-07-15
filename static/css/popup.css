@@ -1,4 +1,4 @@
-.wrapper-popup{
+.popup__wrapper{
   position: fixed;
   top: 0;
   left: 0;
@@ -28,19 +28,19 @@
   to {top: 80px;}
 }
 
-.popup-decoratorbar{
+.popup__decoratorbar{
   width: 100%;
   height: 10px;
   background: linear-gradient(270deg, #337788 0%, #66AABB 100%); /* 漸變語法: linear-gradient(角度, 起始色彩 起始色彩位置, 結束色彩 結束色彩位置); */
   border-radius: 6px 6px 0 0;
 }
-.popup-content{
+.popup__content{
   box-sizing: border-box;
   width: 100%;
   padding: 15px;
   position: relative;
 }
-.popup-close{
+.popup__close{
   position: absolute;
   display: flex;
   align-items: center;
@@ -51,11 +51,11 @@
   width: 30px;
   cursor: pointer;
 }
-.popup-title{
+.popup__title{
   text-align: center;
   margin-bottom: 15px;
 }
-.popup-input{
+.popup__input{
   box-sizing: border-box;
   width: 100%;
   height: 47px;
@@ -69,10 +69,10 @@
   line-height: 14px;
   font-family: "Noto Sans TC", sans-serif;
 }
-.input-password{
+.popup__password{
   font-family: sans-serif;
 }
-.popup-btn{
+.popup__btn{
   box-sizing: border-box;
   width: 100%;
   height: 47px;
@@ -86,7 +86,7 @@
   line-height: 16px;
   color: white;
 }
-.popup-alert{
+.popup__alert{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,7 +95,7 @@
   margin-top: 10px;
   display: none;
 }
-.popup-message{
+.popup__message{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,6 +103,6 @@
   height: 22px;
   margin-top: 10px;
 }
-.popup-change{
+.popup__change{
   cursor: pointer;
 }

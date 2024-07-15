@@ -13,24 +13,23 @@ input{
   line-height: 14px;
   font-weight: 500;
 }
-.frame__booking{
-  width: 1200px;
-  margin: 30px auto 40px auto;
-}
 .headline{
   box-sizing: border-box;
   width: 1000px;
   padding: 0 10px;
   height: 27px;
-  margin: auto;
   font-size: 19px;
   line-height: 16px;
   font-weight: 700;
   display: flex;
   align-items: center;
-  margin-top: 40px;
+  margin: 40px auto 30px auto;
 }
-.booking__section{
+.booking{
+  width: 1200px;
+  margin: 0 auto 40px auto;
+}
+.booking__attraction{
   display: flex;
   box-sizing: border-box;
   width: 1000px;
@@ -38,13 +37,13 @@ input{
   height: 200px;
   margin: 0 auto 40px auto;
 }
-.section__picture{
+.attraction__picture{
   width: 250px;
   height: 200px;
   background-size: cover; 
   background-position: center;
 }
-.section__attraction-info{
+.attraction__info{
   margin: 0 0 30px 30px;
   flex: auto;
   display: grid;
@@ -54,29 +53,32 @@ input{
   align-items: center;
   position: relative;
 }
-.attraction-info__title{
+.attraction__title{
   display: flex;
   color: #448899;
   font-weight: 700;
   line-height: 24px;
   align-items: center;
 }
-.attraction-info__item{
+.attraction__item{
   line-height: 24px;
 }
-.attraction-info__delete{
+.attraction__delete{
   position: absolute;
   right: 0;
   top: 0;
   cursor: pointer;
 }
-.booking__user-info{
+.attraction__delete:hover{
+  filter: brightness(0);
+}
+.booking__user{
   box-sizing: border-box;
   width: 1000px;
   padding: 0 10px;
   margin: 40px auto;
 }
-.user-info__title{
+.user__title{
   height: 24px;
   font-size: 19px;
   line-height: 16px;
@@ -85,40 +87,29 @@ input{
   align-items: center;
   margin-bottom: 20px;
 }
-.user-info__contact-form{
+.user__contact-form{
   display: grid;
   grid-gap: 15px; 
   grid-template-columns: 100%;
   grid-template-rows: 38px 38px 38px auto;
   align-items: center;
 }
-.contact-form__alertText{
+.user__alert{
   font-size: 16px;
   font-weight: 700;
   line-height: 23.17px;
 }
-.user-info__payment{
-  display: grid;
-  grid-gap: 15px; 
-  grid-template-columns: 100%;
-  grid-template-rows: repeat(3, 38px);
-  align-items: center;
-}
-.user-info__confirm{
+.user__confirm{
   width: 100%;
   text-align: right;
 }
-.user-info__confirm p{
+.user__confirm p{
   box-sizing: border-box;
   padding: 5px 0;
 }
-.confirm__error-message{
-  color: darkred;
-  font-weight: 700;
-}
-.confirm__button{
+.user__confirm-btn{
   box-sizing: border-box;
-  margin: 22px 0;
+  margin: 22px 0 0 0;
   border-radius: 5px;
   background-color: #448899;
   width: 173px;
@@ -132,10 +123,16 @@ input{
   border: none;
   cursor: pointer;
 }
-.confirm__button:hover{
-  background-color: #3E7E8E;
+.user__confirm-btn:hover{
+  background-color: #376F7D;
 }
-.booking__none{
+.user__confirm-error{
+  box-sizing: border-box;
+  font-weight: 700;
+  color: darkred;
+  padding: 18px 0 0 0;
+}
+.booking__none-msg{
   box-sizing: border-box;
   width: 1000px;
   padding: 0 10px;
@@ -143,11 +140,11 @@ input{
 }
 
 /* for TapPay */
-.user-info__payment-form{
+.user__payment-form{
   display: grid;
   gap: 15px;
 }
-.form-group{
+.user__form-group{
   display: flex;
   align-items: center;
 }
@@ -160,48 +157,68 @@ input{
   border: 1px solid #E8E8E8;
   border-radius: 5px;
 }
-/*
-.tappay-field-focus{
-  border-color: #66afe9;
+.transfer{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.7);
+  justify-content: center;
+  display: none;
 }
-.has-error{
-  border-color: #843534;
+.transfer__msg{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
-.has-success{
-  border-color:green;
+.transfer__loader{
+  position: relative;
+  top: 38%;
+  border: 3px solid #666666;
+  border-top: 3px solid white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 0.7s linear infinite;
 }
-*/
+@keyframes spin{
+  from {transform: rotate(0deg)}
+  to {transform: rotate(360deg)}
+}
 
 @media(min-width:690px) and (max-width:1199px){
-  hr, .frame, .frame__booking{
+  hr, .booking{
     width: 100%;
   }
-  .headline, .booking__section, .booking__user-info, .booking__none{
+  .headline, .booking__attraction, .booking__user, .booking__none-msg{
     width: calc(100%*(5/6));
   }
 }
 
 
 @media (max-width:689px){
-  hr, .frame, .frame__booking, .headline, 
-  .section__picture, .booking__user-info, .booking__none{
+  hr, .booking, .headline, 
+  .attraction__picture, .booking__user, .booking__none-msg{
     width: 100%;
   }
-  .booking__section{
+  .booking__attraction{
     display: block;
     width: 100%;
     padding: 0 10px;
     height: auto;
     margin: 0 auto 60px auto;
   }
-  .section__attraction-info{
+  .attraction__info{
     margin: 30px 0;
   }
-  .attraction-info__delete{
+  .attraction__delete{
     top: 100%;
     bottom: 0;
   }
-  .contact-form__alertText{
+  .user__alert{
     margin-top: 5px;
   }
 }

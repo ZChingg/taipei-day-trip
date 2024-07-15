@@ -3,28 +3,43 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-import mysql.connector
+from dotenv import load_dotenv
+import os
+import mysql.connector.pooling
 import jwt
 import time, datetime
 import requests
+import bcrypt
 
 app=FastAPI() #uvicorn app:app --reload
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-con = mysql.connector.connect(
-    user = "root",
-    password = "a32128466",
-    host = "localhost",
-    database = "trip"
-)
-print("資料庫連線成功")
+# 使用 .env
+load_dotenv() # take environment variables from .env.
+mysql_user = os.getenv("MYSQL_USER")
+mysql_password = os.getenv("MYSQL_PASSWORD")
+mysql_host = os.getenv("MYSQL_HOST")
+mysql_db = os.getenv("MYSQL_DB")
+jwt_secret_key = os.getenv("JWT_SECRET_KEY")
+tappay_partner_key  = os.getenv("TAPPAY_PARTNER_KEY")
+
+# 使用 connection pool 連接 mysql 資料庫
+dbconfig = {
+	"user": mysql_user,
+    "password": mysql_password,
+    "host": mysql_host,
+    "database": mysql_db
+}
+pool = mysql.connector.pooling.MySQLConnectionPool(pool_name = "mypool",
+												   pool_size = 15,
+												   **dbconfig)
 
 @app.get("/api/attractions")
 async def 取得景點資料列表(request: Request,
 					 page: int = Query(0, ge=0), # ge=0 為 greater than or equal to 0
 					 keyword: str = Query(None)):
 	try:
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor(dictionary=True) # 預設回傳資料為tuple[(1,平安鐘)]，轉成用包含字典的列表[{'id':1,'name':平安鐘}]
 		if keyword:
 			sql = """SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata 
@@ -67,12 +82,14 @@ async def 取得景點資料列表(request: Request,
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	finally:
+		con.close()
 
 @app.get("/api/attraction/{attractionId}")
 async def 根據景點編號取得景點資料(request: Request,
 					 attractionId: int):
 	try:
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor(dictionary=True) # 預設回傳資料為tuple[(1,平安鐘)]，轉成用包含字典的列表[{'id':1,'name':平安鐘}]
 		sql =  """SELECT tripdata.id, name, category, description, address, transport, mrt, lat, lng, GROUP_CONCAT(images) AS images FROM tripdata 
 		INNER JOIN images ON tripdata.id = images.trip_id 
@@ -88,15 +105,17 @@ async def 根據景點編號取得景點資料(request: Request,
 			return JSONResponse(
 				{"error": True, "message": "景點編號不正確"},
 				status_code=400)
-	except Exception as e: # 例外處理，Exception: 通用的異常類型(不知錯誤型別)
+	except Exception as e: 
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	finally:
+		con.close()
 
 @app.get("/api/mrts")
 async def 取得捷運站名稱列表(request: Request):
 	try:
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor(dictionary=True)
 		sql = "SELECT mrt FROM tripdata GROUP BY mrt ORDER BY COUNT(mrt) DESC"
 		cursor.execute(sql)
@@ -112,6 +131,8 @@ async def 取得捷運站名稱列表(request: Request):
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	finally:
+		con.close()
 
 
 class SignUp(BaseModel):
@@ -155,17 +176,32 @@ class PaymentRequest(BaseModel):
     prime: str
     order: Order
 
-SECRET_KEY = "BF6B06649E573E1F9049B869DD4F83CCBA8C250E733C9E2F8DAD2081611CAB1C"
+# 密碼以 bcrypt 加密
+def hash_password(password):
+	salt = bcrypt.gensalt()
+	hash_password = bcrypt.hashpw(password.encode("utf-8"), salt)
+	return hash_password.decode("utf-8")
 
+# HTTP Bearer token authentication (JWT驗證)
+security = HTTPBearer()
+
+def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): # credentials 是 HTTPAuthorizationCredentials 類型（包含著 scheme、credentials），且依賴於 security
+	try:
+		token = credentials.credentials # 會從請求 header 獲取 token，若是 credentials.scheme 就是獲取 "Bearer"
+		payload = jwt.decode(token, jwt_secret_key, algorithms=["HS256"])
+		return payload # token 驗證成功
+	except Exception:
+		return None # token 驗證失敗
+	
 @app.post("/api/user")
 async def 註冊一個新的會員(request: Request,
 				   data: SignUp = None):
 	try:
-		signup_dict = data.model_dump() # 將資料轉換為字典格式
+		signup_dict = data.dict() # 將資料轉換為字典格式
 		name = signup_dict["name"] # 取值
 		email = signup_dict["email"]
 		password = signup_dict["password"]
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor(dictionary=True)
 		cursor.execute("SELECT email FROM member WHERE email = %s", (email,))
 		data = cursor.fetchone()
@@ -174,7 +210,8 @@ async def 註冊一個新的會員(request: Request,
 				{"error": True, "message": "註冊失敗，重複的 Email 或其他原因"},
 				status_code=400)
 		else:
-			cursor.execute("INSERT INTO member(name, email, password) VALUES(%s, %s, %s)", (name, email, password))
+			hashed_password = hash_password(password)
+			cursor.execute("INSERT INTO member(name, email, password) VALUES(%s, %s, %s)", (name, email, hashed_password))
 			con.commit()
 			return JSONResponse(
 				{"ok": True})
@@ -182,17 +219,8 @@ async def 註冊一個新的會員(request: Request,
 		return JSONResponse(
 			{"error": True, "message": f"{e}"},
 			status_code=500)
-
-# HTTP Bearer token authentication (JWT驗證)
-security = HTTPBearer()
-
-def jwt_bearer(credentials: HTTPAuthorizationCredentials = Depends(security)): # credentials 是 HTTPAuthorizationCredentials 類型（包含著 scheme、credentials），且依賴於 security
-	try:
-		token = credentials.credentials # 會從請求 header 獲取 token，若是 credentials.scheme 就是獲取 "Bearer"
-		payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-		return payload # token 驗證成功
-	except Exception:
-		return None # token 驗證失敗
+	finally:
+		con.close()
 
 @app.get("/api/user/auth")
 async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer)): # payload 是字典類型，且值由 Depends(jwt_bearer) 提供
@@ -203,15 +231,17 @@ async def 取得當前登入的會員資訊(payload: dict = Depends(jwt_bearer))
 async def 登入會員帳戶(request: Request,
 				 data: SignIn = None): 
 	try:
-		signin_dict = data.model_dump() # 將資料轉換為字典格式
+		signin_dict = data.dict() 
 		email = signin_dict["email"]
 		password = signin_dict["password"]
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor()
-		cursor.execute("SELECT id, name, email FROM member WHERE email = %s and password = %s", (email, password))
+		cursor.execute("SELECT * FROM member WHERE email = %s", (email, ))
 		data = cursor.fetchone()
-		if data:
-			id, name, email = data
+		hash_password = data[3]
+		print(hash_password)
+		if data and bcrypt.checkpw(password.encode("utf-8"), hash_password.encode("utf-8")):
+			id, name, email, _ = data
 			payload = {
 				"exp": (datetime.datetime.now()+datetime.timedelta(days=1)).timestamp(), # 現在時間+一天後轉為時間戳
 				"data": {
@@ -220,56 +250,61 @@ async def 登入會員帳戶(request: Request,
 					"email": email
 					}
 			}
-			token = jwt.encode(payload, SECRET_KEY, algorithm = "HS256")
+			token = jwt.encode(payload, jwt_secret_key, algorithm = "HS256")
 			return JSONResponse(
 				{"token": token}) 
 		else:
 			return JSONResponse(
 				{"error": True, "message": "登入失敗，帳號或密碼錯誤或其他原因"},
 				status_code=400)
-	except Exception as e: # 例外處理，Exception: 通用的異常類型(不知錯誤型別)
+	except Exception as e: 
 		return JSONResponse({
 		"error": True, "message": f"{e}"},
 		status_code=500)
+	finally:
+		con.close()
 	
 @app.get("/api/booking")
 async def 取得尚未確認下單的預定行程(payload: dict = Depends(jwt_bearer)):
 	if payload != None:
 		member_id =  payload["data"]["id"]
-		con.reconnect()
-		cursor = con.cursor()
-		cursor.execute( # 透過 token 得到使用者 id 後取其預定資料
-			"""SELECT attraction_id, date, time, price FROM cart 
-			WHERE member_id = %s 
-			ORDER BY id DESC 
-			LIMIT 1""", 
-			(member_id,)
-			)
-		data = cursor.fetchone()
-		if data:
-			attraction_id, date, time, price = data
-			cursor.execute( # 根據景點編號取對應景點資料
-				"""SELECT name, address, images 
-				FROM tripdata INNER JOIN images ON tripdata.id = images.trip_id 
-				WHERE tripdata.id = %s
-				LIMIT 1""",
-				(attraction_id,)
+		con = pool.get_connection()
+		try:
+			cursor = con.cursor()
+			cursor.execute( # 透過 token 得到使用者 id 後取其預定資料
+				"""SELECT attraction_id, date, time, price FROM cart 
+				WHERE member_id = %s 
+				ORDER BY id DESC 
+				LIMIT 1""", 
+				(member_id,)
 				)
 			data = cursor.fetchone()
-			name, address, images = data
-			return JSONResponse({
-					"data": {
-						"attraction": {
-							"id": attraction_id,
-							"name": name,
-							"address": address,
-							"image": images
-						},
-						"date": date,
-						"time": time,
-						"price": price
-					}
-					})
+			if data:
+				attraction_id, date, time, price = data
+				cursor.execute( # 根據景點編號取對應景點資料
+					"""SELECT name, address, images 
+					FROM tripdata INNER JOIN images ON tripdata.id = images.trip_id 
+					WHERE tripdata.id = %s
+					LIMIT 1""",
+					(attraction_id,)
+					)
+				data = cursor.fetchone()
+				name, address, images = data
+				return JSONResponse({
+						"data": {
+							"attraction": {
+								"id": attraction_id,
+								"name": name,
+								"address": address,
+								"image": images
+							},
+							"date": date,
+							"time": time,
+							"price": price
+						}
+						})
+		finally:
+			con.close()
 	else:
 		return JSONResponse(
 			{"error": True, "message": "未登入系統，拒絕存取"},
@@ -284,12 +319,12 @@ async def 建立新的預定行程(
 		if payload != None:
 			member_id = payload["data"]["id"]
 			try:
-				booking_dict = data.model_dump() # 將資料轉換為字典格式
+				booking_dict = data.dict()
 				attraction_id = booking_dict["attractionId"]
 				date = booking_dict["date"]
 				time = booking_dict["time"]
 				price = booking_dict["price"]
-				con.reconnect()
+				con = pool.get_connection()
 				cursor=con.cursor()
 				cursor.execute( # 儲存預定資料至資料庫
 					"INSERT INTO cart(member_id, attraction_id, date, time, price) VALUES(%s, %s, %s, %s, %s)",
@@ -309,26 +344,31 @@ async def 建立新的預定行程(
 		return JSONResponse(
 			{"error": True, "message": f"{e}"},
 			status_code=500)
+	finally:
+		con.close()
 
 @app.delete("/api/booking")
 async def 刪除目前的預定行程(payload: dict = Depends(jwt_bearer)):
 	if payload != None:
 		member_id =  payload["data"]["id"]
-		con.reconnect()
+		con = pool.get_connection()
 		cursor = con.cursor()
 		cursor.execute("DELETE FROM cart WHERE member_id = %s", (member_id,))
 		con.commit()
+		con.close()
 		return JSONResponse({"ok": True})
 	else:
 		return JSONResponse(
 			{"error": True, "message": "未登入系統，拒絕存取"},
 			status_code=403)
 
+# 為每筆訂單建立唯一的訂單編號
 def get_order_number(member_id):
 	# 訂單編號 = YYMMDDHHMMSS + 時間戳後6位 + member id
 	order_number = datetime.datetime.now().strftime("%Y%m%d%H%M%S") + str(time.time()).replace('.', '')[-6:] + str(member_id)
 	return order_number
 
+# 將付款資料存入資料庫
 def insert_payment_data(cursor, order_id, result):
     sql = """INSERT INTO payment
     (orders_id, status, msg, amount, acquirer, currency, rec_trade_id, bank_transaction_id, 
@@ -378,7 +418,7 @@ async def 建立新的訂單並完成付款程序(
 			member_id = payload["data"]["id"]
 			try:
 				# 儲存訂單資料至資料庫
-				orders_dict = data.model_dump()
+				orders_dict = data.dict()
 				attraction_id = orders_dict["order"]["trip"]["attraction"]["id"]
 				date = orders_dict["order"]["trip"]["date"]
 				time = orders_dict["order"]["trip"]["time"]
@@ -387,7 +427,7 @@ async def 建立新的訂單並完成付款程序(
 				email = orders_dict["order"]["contact"]["email"]
 				phone = orders_dict["order"]["contact"]["phone"]
 				payment = "UNPAID"
-				con.reconnect()
+				con = pool.get_connection()
 				cursor=con.cursor()
 				cursor.execute(
 					"""INSERT INTO orders(member_id, attraction_id, date, time, price, name, email, phone, payment) 
@@ -403,11 +443,11 @@ async def 建立新的訂單並完成付款程序(
 				# 發送 POST 請求至 TapPay Pay By Prime API
 				tappay_headers = {
 					"Content-Type": "application/json",
-                    "x-api-key": "partner_eYAXWT2z0LtyzroXr7C5FdSR2j1TOVu7exnhLQKVUv448pnpDOXD50IR"
+                    "x-api-key": tappay_partner_key
 					}
 				tappay_json = {
 					"prime": data.prime,
-					"partner_key": "partner_eYAXWT2z0LtyzroXr7C5FdSR2j1TOVu7exnhLQKVUv448pnpDOXD50IR",
+					"partner_key": tappay_partner_key,
 					"merchant_id": "ZChingg_CTBC",
 					"details": "台北市區一日遊",
 					"amount": price,
@@ -470,12 +510,8 @@ async def 建立新的訂單並完成付款程序(
 		return JSONResponse(
 			{"error": True, "message": f"{e}"},
 			status_code=500)
-
-
-
-
-con.close()
-
+	finally:
+		con.close()
 
 
 # Static Pages (Never Modify Code in this Block)

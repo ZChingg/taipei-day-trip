@@ -8,38 +8,38 @@
 </head>
 <body>
   <div class="navigation">
-    <div class="frame">
+    <div class="navigation__frame">
       <h2><a href="/">台北一日遊</a></h2>
-      <div class="frame-flexend">
-        <div class="item-navigation" id="bookingPage">預定行程</div>
-        <div class="item-navigation" id="signin" onclick="getSign()" style="display:none">登入/註冊</div>
-        <div class="item-navigation" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
+      <div class="navigation__frame--end">
+        <div class="navigation__item" id="bookingPage">預定行程</div>
+        <div class="navigation__item" id="signin" onclick="getSign()" style="display:none">登入/註冊</div>
+        <div class="navigation__item" id="signout" onclick="getSignOut()" style="display:none">登出系統</div>
       </div>
     </div>
   </div>
   <hr>
   <div class="headline">您好，<span id="welcomeMemberName"></span>，待預訂的行程如下：</div>
-  <form class="frame__booking" id="bookingData" style="display:none;">
-    <div class="booking__section">
-      <div class="section__picture"></div>
-      <div class="section__attraction-info">
-        <div class="attraction-info__delete" onclick="getDelete(true)"><img src="/static/pic/delete.png"></div>
-        <div class="attraction-info__title">
+  <form class="booking" id="bookingData" style="display:none;">
+    <div class="booking__attraction">
+      <div class="attraction__picture"></div>
+      <div class="attraction__info">
+        <div class="attraction__delete" onclick="getDelete(true)"><img src="/static/pic/delete.png"></div>
+        <div class="attraction__title">
           <a id="tourLink">台北一日遊：
             <span id="tourName"></span>
           </a>
         </div>
         <div></div>
-        <div class="attraction-info__item">日期：<span id="tourDate"></span></div>
-        <div class="attraction-info__item">時間：<span id="tourTime"></span></div>
-        <div class="attraction-info__item">費用：<span id="tourPrice"></span></div>
-        <div class="attraction-info__item">地點：<span id="tourAddress"></span></div>
+        <div class="attraction__item">日期：<span id="tourDate"></span></div>
+        <div class="attraction__item">時間：<span id="tourTime"></span></div>
+        <div class="attraction__item">費用：<span id="tourPrice"></span></div>
+        <div class="attraction__item">地點：<span id="tourAddress"></span></div>
       </div>
     </div>
     <hr>
-    <div class="booking__user-info">
-      <div class="user-info__title">您的聯絡資訊</div>
-      <div class="user-info__contact-form">
+    <div class="booking__user">
+      <div class="user__title">您的聯絡資訊</div>
+      <div class="user__contact-form">
         <div>聯絡姓名：
           <span>
             <input type="text" id="bookingName" required>
@@ -55,40 +55,45 @@
             <input type="tel" id="bookingTel" required>
           </span>
         </div>
-        <div class="contact-form__alertText">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
+        <div class="user__alert">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
       </div>
     </div>
     <hr>
-    <div class="booking__user-info">
-      <div class="user-info__title">信用卡付款資訊</div>
-      <div class="user-info__payment-form">
-        <div class="form-group">
+    <div class="booking__user">
+      <div class="user__title">信用卡付款資訊</div>
+      <div class="user__payment-form">
+        <div class="user__form-group">
           <label for="card-number">卡片號碼：</label>
           <div class="tpfield" id="card-number"></div>
         </div>
-        <div class="form-group">
+        <div class="user__form-group">
           <label for="card-expiration-date">過期時間：</label>
           <div class="tpfield" id="card-expiration-date"></div>
         </div>
-        <div class="form-group">
+        <div class="user__form-group">
           <label for="card-ccv">驗證密碼：</label>
           <div class="tpfield" id="card-ccv"></div>
         </div>
       </div>
     </div>
     <hr>
-    <div class="booking__user-info">
-      <div class="user-info__confirm">
-        <p class="confirm__error-message"></p>
+    <div class="booking__user" style="margin-bottom: 62px;">
+      <div class="user__confirm">
         <p><strong>總價：<span id="tourPayment"></span></strong></p>
-        <button type="submit" class="confirm__button">確認訂購並付款</button>
+        <button type="submit" class="user__confirm-btn">確認訂購並付款</button>
+        <div class="user__confirm-error" id="bookingError"></div>
       </div>
     </div>
   </form>
-  <div class="frame__booking" id="noBookingData" style="display:none;">
-    <div class="booking__none">目前沒有任何待預訂的行程</div>
+  <div class="booking" id="noBookingData" style="display:none;">
+    <div class="booking__none-msg">目前沒有任何待預訂的行程</div>
   </div>
   <footer><p>COPYRIGHT © 2021 台北一日遊</p></footer>
+  <!-- 交易進行 loader -->
+  <div class="transfer">
+    <div class="transfer__msg">交易進行中，請稍候 …</div>
+    <div class="transfer__loader"></div>
+  </div>
   <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.14.0"></script> <!-- TapPay -->
   <script src="/static/js/sign.js"></script>
   <script src="/static/js/booking.js"></script>
