@@ -69,7 +69,6 @@
 }
 .arrow{
     opacity: 50%;
-    margin-right: 10px;
     cursor: pointer;
 }
 .arrow:hover{
@@ -77,9 +76,11 @@
 }
 .arrow-left{
     padding: 9px 0 9px 15px;
+    margin-right: 10px;
 }
 .arrow-right{
     padding: 9px 15px 9px 0;
+    margin-left: 10px;
 }
 .listbar__mrts{
     width: 1106px;
@@ -113,7 +114,7 @@
     width: 1200px;
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 30px;
-    padding: 15px 20px;
+    padding: 15px;
     margin-bottom: 40px;
 }
 .attraction__box{
