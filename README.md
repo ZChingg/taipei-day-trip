@@ -19,58 +19,32 @@ Test Payment :
 - [Demo](#demo)
 - [Main Features](#main-features)
 - [Architecture](#architecture)
-- [Frontend Technique](#frontend-technique)
-- [Backend Technique](#backend-technique)
-  - [Framework](#framework)
-  - [Database](#database)
-  - [Authentication](#authentication)
-  - [Cloud Service](#cloud-service)
-  - [Payment System](#payment-system)
-  - [Version Control](#version-control)
+- [Technique](#technique)
 - [Figma Prototype](#figma-prototype)
 - [API Doc](#api-doc)
 - [Contact](#contact)
 
 ## Demo
 
-## Main Fratures
+## Main Features
 
 ## Architecture
 
-## Frontend Technique
-
+## Technique
+#### Frontend Technique
 - HTML
 - CSS
 - JavaScript
 - AJAX
 - RWD
 
-## Backend Technique
-
-#### Framework
-
-- Python FastAPI
-
-#### Database
-
-- MySQL
-
-#### Authentication
-
-- JWT
-- Bcrypt
-
-#### Cloud Service
-
-- AWS EC2
-
-#### Payment System
-
-- TapPay SDK
-
-#### Version Control
-
-- Git / Github
+#### Backend Technique
+- Environment : Python, FastAPI
+- Database : MySQL
+- Authentication : JWT, Bcrypt
+- Cloud Service : AWS EC2
+- Payment System : TapPay SDK
+- Version Control : Git / Github
 
 ## Figma Prototype
 
@@ -82,6 +56,6 @@ Test Payment :
 
 ## Contact
 
-趙姿晴 Tzu-Ching, Chao (Evelyn Chao)
+Name : 趙姿晴 Tzu-Ching, Chao (Evelyn Chao)
 
 Email : zchingchaoo@gmail.com
